@@ -1,0 +1,51 @@
+<section class="page wrap">
+  <h1 class="page-title">Find Partner Institutes</h1>
+  <div class="search">
+    <input type="search" placeholder="Search institute name, course or service…" [value]="q()" (input)="q.set($any($event.target).value)" (keyup.enter)="go()">
+    <button class="btn-blue sm" (click)="go()">Search</button>
+  </div>
+  <div class="filters">
+    <input class="field-input" inputmode="numeric" maxlength="6" placeholder="📍 PIN code" [value]="pin()" (input)="pin.set($any($event.target).value)" (keyup.enter)="go()">
+    <select class="field-input" [value]="state()" (change)="onState($any($event.target).value)"><option value="">All states</option>@for (s of loc().states; track s) { <option [value]="s" [selected]="s === state()">{{ s }}</option> }</select>
+    <select class="field-input" [value]="district()" (change)="onDistrict($any($event.target).value)"><option value="">All districts</option>@for (s of loc().districts; track s) { <option [value]="s" [selected]="s === district()">{{ s }}</option> }</select>
+    <select class="field-input" [value]="city()" (change)="onCity($any($event.target).value)"><option value="">All cities</option>@for (s of loc().cities; track s) { <option [value]="s" [selected]="s === city()">{{ s }}</option> }</select>
+    <button class="btn-sm ghost clear" (click)="clear()">Clear</button>
+  </div>
+  <div class="chips">
+    <button class="chip" [class.on]="!type()" (click)="setType('')">All</button>
+    @for (t of types; track t.value) { <button class="chip" [class.on]="type() === t.value" (click)="setType(t.value)">{{ t.icon }} {{ t.label }}</button> }
+  </div>
+
+  @if (error()) { <div class="note err">{{ error() }}</div> }
+  @if (loading()) { <p class="empty">Loading…</p> }
+  @else if (!items().length) { <p class="empty">No institutes found for this search. Try another PIN code, city or category.</p> }
+  @else {
+    <p class="muted small">{{ total() }} institute(s) found</p>
+    <div class="list">
+      @for (s of items(); track s.id) {
+        <a class="item" [routerLink]="[s.id]">
+          <div class="top">
+            <span class="logo-sq">@if (s.institution.logoUrl) { <img [src]="s.institution.logoUrl" alt=""> } @else { <span>{{ icon(s.institution.type) }}</span> }</span>
+            <div><h3>{{ s.institution.name }}</h3><span class="badge">{{ label(s.institution.type) }}</span> <span class="badge ok">✔ Approved partner</span>@if (s.sponsored) { <span class="badge warn">⭐ Sponsored</span> }</div>
+          </div>
+          <p class="small muted addr">📍 {{ s.institution.address }}{{ s.institution.address ? ', ' : '' }}{{ s.institution.city }}{{ s.institution.district ? ', ' + s.institution.district : '' }} {{ s.institution.pin }}</p>
+          @if (s.institution.contactPhone) { <p class="small">📞 {{ s.institution.contactPhone }}</p> }
+          @if (s.headline) { <p class="headline">{{ s.headline }}</p> }
+          @if (s.offerings.length) { <ul class="mini">@for (o of s.offerings; track o) { <li>{{ o }}</li> }</ul> }
+          <div class="foot">
+            @if (s.topDiscount) { <span class="off-badge">Up to {{ s.topDiscount }}% OFF</span> }
+            @if (s.fromFee !== null) { <span class="small">From {{ s.fromFee | currency:'INR':'symbol':'1.0-0' }}</span> }
+            <span class="more">View details →</span>
+          </div>
+        </a>
+      }
+    </div>
+    @if (pages() > 1) {
+      <div class="pager">
+        <button class="btn-sm ghost" [disabled]="page() <= 1" (click)="turn(-1)">← Prev</button>
+        <span class="small">Page {{ page() }} of {{ pages() }}</span>
+        <button class="btn-sm ghost" [disabled]="page() >= pages()" (click)="turn(1)">Next →</button>
+      </div>
+    }
+  }
+</section>

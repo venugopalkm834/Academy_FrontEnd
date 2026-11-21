@@ -1,0 +1,32 @@
+<h1 class="page-title">Membership Plans</h1>
+<p class="muted small">Create one-year or lifetime plans, set the price, and choose who sees each plan: everyone, or only LKG to SSLC members, or only PUC to Degree members (picked automatically from the member's education level). Changes apply immediately.</p>
+<form class="card form" [formGroup]="form" (ngSubmit)="save()">
+  <h3>{{ editing() ? 'Edit plan' : 'New plan' }}</h3>
+  <div class="grid">
+    <label class="full">Plan name *<input formControlName="name" placeholder="e.g. One-Year Membership (LKG to SSLC)"></label>
+    <label>Type<select formControlName="kind"><option value="YEARLY">One-year / fixed period</option><option value="LIFETIME">Lifetime</option></select></label>
+    <label>Price (₹) *<input type="number" min="0" formControlName="price"></label>
+    @if (form.value.kind === 'YEARLY') { <label>Valid for (days)<input type="number" min="1" formControlName="validityDays"></label> }
+    <label>Available to<select formControlName="educationGroup"><option value="ANY">All members</option><option value="LKG_SSLC">LKG to SSLC members</option><option value="PUC_DEGREE">PUC to Degree members</option></select></label>
+    <label>Display order<input type="number" formControlName="order"></label>
+    <label class="full">Short description<input formControlName="description"></label>
+    <label class="full">Benefits (comma separated)<input formControlName="benefits" placeholder="Digital ID card, Partner discounts, Member-only offers"></label>
+  </div>
+  <label class="chk"><input type="checkbox" formControlName="active"> Plan is active (members can buy it)</label>
+  @if (msg()) { <div class="note ok">{{ msg() }}</div> } @if (err()) { <div class="note err">{{ err() }}</div> }
+  <div class="actions"><button class="btn-blue" [disabled]="busy()">{{ editing() ? 'Save changes' : 'Create plan' }}</button>@if (editing()) { <button type="button" class="btn-sm ghost" (click)="reset()">Cancel edit</button> }</div>
+</form>
+
+<h2 class="sub">All plans</h2>
+@if (!items().length) { <p class="empty">No plans yet.</p> }
+<div class="list">
+  @for (p of items(); track p._id) {
+    <article class="item">
+      <div class="oh"><h3>{{ p.name }}</h3><span class="badge" [class.ok]="p.active" [class.bad]="!p.active">{{ p.active ? 'Active' : 'Off' }}</span></div>
+      <p class="price">{{ p.price | currency:'INR':'symbol':'1.0-0' }}</p>
+      <p class="small muted">{{ p.kind === 'LIFETIME' ? 'Lifetime' : p.validityDays + ' days' }} · {{ groupName(p.educationGroup) }}</p>
+      @if (p.benefits?.length) { <p class="small">{{ p.benefits.join(' · ') }}</p> }
+      <div class="actions"><button class="btn-sm ghost" (click)="edit(p)">Edit</button><button class="btn-sm" (click)="toggle(p)">{{ p.active ? 'Turn off' : 'Turn on' }}</button><button class="btn-sm red" (click)="remove(p)">Delete</button></div>
+    </article>
+  }
+</div>

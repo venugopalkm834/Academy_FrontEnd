@@ -1,0 +1,46 @@
+<h1 class="page-title">My Membership</h1>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (msg()) { <div class="note ok">{{ msg() }}</div> }
+@if (d(); as x) {
+  <div class="item status">
+    <div class="oh"><h3>Membership status</h3>
+      <span class="badge" [class.ok]="x.view.status === 'ACTIVE'" [class.warn]="x.view.status === 'PENDING'" [class.bad]="x.view.status === 'EXPIRED' || x.view.status === 'SUSPENDED'">{{ x.view.status === 'NONE' ? 'Not active' : x.view.status }}</span></div>
+    @if (x.view.membershipId) {
+      <p>Member ID: <b>{{ x.view.membershipId }}</b> · {{ x.view.planName }}</p>
+      <p class="small muted">{{ x.view.lifetime ? 'Lifetime membership' : x.view.validUntil ? 'Valid until ' + (x.view.validUntil | date:'mediumDate') : '' }}</p>
+      <div class="actions"><a class="btn-sm yellow" routerLink="../id-card">View my ID card</a></div>
+    } @else { <p class="muted small">Choose a plan below. Your membership and digital ID card are activated only after your payment is verified.</p> }
+    @if (underReview()) { <p class="note warn">⏳ A payment is being verified by the admin.</p> }
+  </div>
+
+  @if (x.view.status === 'ACTIVE' && x.view.lifetime) { <p class="note ok">✔ You have a lifetime membership. No renewal needed.</p> }
+  @else {
+    <h2 class="sub">{{ x.view.status === 'ACTIVE' ? 'Renew membership' : 'Choose a plan' }}@if (group(x.group)) { <small class="muted"> · {{ group(x.group) }}</small> }</h2>
+    @if (!x.plans.length) { <p class="empty">No membership plans are available right now.</p> }
+    <div class="list">
+      @for (p of x.plans; track p._id) {
+        <article class="item plan" [class.wide]="manual() === p._id">
+          <div class="oh"><h3>{{ p.name }}</h3><span class="badge warn">{{ p.kind === 'LIFETIME' ? 'Lifetime' : p.validityDays + ' days' }}</span></div>
+          <p class="price">{{ p.price | currency:'INR':'symbol':'1.0-0' }}</p>
+          @if (p.description) { <p class="small muted">{{ p.description }}</p> }
+          @if (p.benefits.length) { <ul class="benefits">@for (b of p.benefits; track b) { <li>{{ b }}</li> }</ul> }
+          <div class="actions">
+            @if (x.gateway.enabled || p.price <= 0) { <button class="btn-sm green" [disabled]="busy() === p._id || underReview()" (click)="payOnline(p)">{{ busy() === p._id ? 'Please wait…' : p.price <= 0 ? 'Activate free' : 'Pay now' }}</button> }
+            @if (p.price > 0) { <button class="btn-sm ghost" [disabled]="underReview()" (click)="toggle(p._id)">{{ manual() === p._id ? 'Hide' : 'Pay by UPI / bank' }}</button> }
+          </div>
+          @if (manual() === p._id) { <ac-payment-form payUrl="/member/membership/pay-manual" [extra]="{ planId: p._id }" [amount]="p.price" (paid)="paidManual()" /> }
+        </article>
+      }
+    </div>
+    @if (!x.gateway.enabled) { <p class="small muted">Online card / UPI payment is not switched on yet. Please use the UPI / bank option.</p> }
+  }
+
+  @if (payments().length) {
+    <h2 class="sub">Payment history</h2>
+    <div class="list">@for (p of payments(); track p._id) {
+      <div class="item"><div class="oh"><b>{{ p.amount | currency:'INR':'symbol':'1.0-0' }}</b>
+        <span class="badge" [class.ok]="p.status === 'APPROVED'" [class.warn]="p.status === 'UNDER_REVIEW' || p.status === 'CREATED'" [class.bad]="p.status === 'REJECTED' || p.status === 'FAILED' || p.status === 'REFUNDED'">{{ label(p.status) }}</span></div>
+        <small class="muted">{{ p.method === 'GATEWAY' ? 'Online' : 'UPI / bank' }} · {{ p.createdAt | date:'medium' }}</small>
+        @if (p.rejectionReason) { <small class="err">{{ p.rejectionReason }}</small> }</div> }</div>
+  }
+}

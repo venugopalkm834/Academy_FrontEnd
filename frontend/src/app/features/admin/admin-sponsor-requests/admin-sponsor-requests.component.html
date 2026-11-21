@@ -1,0 +1,22 @@
+<h1 class="page-title">Sponsor Requests</h1>
+<p class="muted small">Partners who asked to be featured on the main page. Approving publishes the ad right away for the configured number of days.</p>
+<div class="chips">@for (f of filters; track f[0]) { <button class="chip" [class.on]="filter() === f[0]" (click)="filter.set(f[0])">{{ f[1] }}</button> }</div>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (!loading() && !items().length) { <p class="empty">Nothing here.</p> }
+<div class="list">
+  @for (r of items(); track r._id) {
+    <article class="item">
+      <div class="oh"><h3>{{ r.institution?.name }}</h3>
+        <span class="badge" [class.ok]="r.status === 'ACTIVE'" [class.warn]="r.status === 'PAYMENT_REVIEW' || r.status === 'PENDING_APPROVAL' || r.status === 'PENDING_PAYMENT'" [class.bad]="r.status === 'REJECTED' || r.status === 'CANCELLED'">{{ label(r.status) }}</span></div>
+      @if (r.imageUrl) { <img class="prev banner" [src]="r.imageUrl" alt=""> }
+      <p class="headline">{{ r.headline }}</p>
+      @if (r.adText) { <p class="small">{{ r.adText }}</p> }
+      <p class="muted small">{{ r.durationDays }} days · {{ r.amount > 0 ? (r.amount | currency:'INR':'symbol':'1.0-0') : 'free' }} · {{ r.createdAt | date:'mediumDate' }}@if (r.payment) { <br>🔖 Txn {{ r.payment.txn }} ({{ r.payment.status }}) }</p>
+      @if (r.note) { <p class="note err">{{ r.note }}</p> }
+      <div class="actions">
+        @if (r.payment?.hasProof) { <button class="btn-sm ghost" (click)="proof(r)">🖼 Screenshot</button> }
+        @if (r.status === 'PAYMENT_REVIEW' || r.status === 'PENDING_APPROVAL') { <button class="btn-sm green" (click)="review(r, 'approve')">Approve &amp; publish</button><button class="btn-sm red" (click)="review(r, 'reject')">Reject</button> }
+      </div>
+    </article>
+  }
+</div>

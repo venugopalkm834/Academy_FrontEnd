@@ -1,0 +1,22 @@
+<h1 class="page-title">Partners</h1>
+<div class="chips">@for (f of filters; track f) { <button class="chip" [class.on]="filter() === f" (click)="setFilter(f)">{{ f || 'All' }}</button> }</div>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (!loading() && !items().length) { <p class="empty">No partners in this view.</p> }
+<div class="list">
+  @for (p of items(); track p.id) {
+    <article class="item">
+      <div class="oh"><h3>{{ p.institution?.name }}</h3>
+        <span class="badge" [class.ok]="p.state === 'APPROVED'" [class.warn]="p.state === 'PENDING'" [class.bad]="p.state === 'REJECTED' || p.state === 'SUSPENDED'">{{ p.state }}</span></div>
+      <p><span class="badge">{{ label(p.institution?.type) }}</span> <span class="muted small">📍 {{ p.institution?.city }}</span></p>
+      <p class="small">👤 {{ p.contactName }}<br>✉ {{ p.email }}<br>📞 {{ p.phone }}</p>
+      @if (p.rejectionReason) { <p class="note err">{{ p.rejectionReason }}</p> }
+      <div class="actions">
+        @if (p.hasDocument) { <button class="btn-sm ghost" (click)="doc(p)">📄 Document</button> }
+        @if (p.state === 'PENDING' || p.state === 'REJECTED') { <button class="btn-sm green" (click)="act(p, 'approve')">Approve</button> }
+        @if (p.state === 'PENDING') { <button class="btn-sm red" (click)="act(p, 'reject')">Reject</button> }
+        @if (p.state === 'APPROVED') { <button class="btn-sm red" (click)="act(p, 'suspend')">Suspend</button> }
+        @if (p.state === 'SUSPENDED') { <button class="btn-sm green" (click)="act(p, 'reactivate')">Reactivate</button> }
+      </div>
+    </article>
+  }
+</div>

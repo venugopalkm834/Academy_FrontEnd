@@ -1,0 +1,15 @@
+<section class="page wrap narrow-box">
+  <h1 class="page-title">Membership verification</h1>
+  @if (error()) { <div class="note err">{{ error() }}</div> }
+  @if (r(); as v) {
+    @if (!v.memberId) { <div class="result bad"><span>✖</span><b>Not recognised</b><p>This code does not match any Academic Club membership.</p></div> }
+    @else {
+      <div class="result" [class.ok]="v.valid" [class.bad]="!v.valid">
+        <span>{{ v.valid ? '✔' : '✖' }}</span><b>{{ v.valid ? 'Valid active member' : 'Membership ' + (v.status | lowercase) }}</b>
+        @if (v.photo) { <img [src]="v.photo" alt="Member photo"> }
+        <h2>{{ v.name }}</h2>
+        <p>Member ID: <b>{{ v.memberId }}</b><br>{{ v.memberType === 'PARENT' ? 'Parent' : 'Student' }} · {{ v.planName }}<br>{{ v.lifetime ? 'Lifetime membership' : v.validUntil ? 'Valid until ' + (v.validUntil | date:'dd MMM yyyy') : '' }}</p>
+      </div>
+    }
+  }
+</section>

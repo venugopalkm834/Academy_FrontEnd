@@ -1,0 +1,5 @@
+.btn-yellow, .btn-blue, .btn-outline { display: inline-block; border: 0; cursor: pointer; font: 600 16px Poppins; padding: 12px 26px; border-radius: 30px; transition: transform .15s, box-shadow .15s; }
+.btn-yellow { background: var(--yellow); color: var(--navy); } .btn-blue { background: var(--navy); color: #fff; }
+.btn-outline { border: 2px solid var(--navy); color: var(--navy); margin-left: 10px; padding: 10px 24px; background: transparent; }
+.sm { padding: 8px 18px; font-size: 14px; } button:disabled { opacity: .5; cursor: not-allowed; }
+.btn-yellow:hover, .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 6px 14px #0003; }

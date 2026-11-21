@@ -1,0 +1,2 @@
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin: 10px 0; }
+.cat { background: #fff; border: 0; border-radius: 14px; padding: 14px 6px; font: 600 13px Poppins; color: var(--navy); cursor: pointer; box-shadow: 0 3px 12px #062b5518; span { display: block; font-size: 30px; margin-bottom: 4px; } &:hover { transform: translateY(-2px); } }

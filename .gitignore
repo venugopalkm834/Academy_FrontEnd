@@ -1,0 +1,16 @@
+# dependencies and build output
+node_modules/
+dist/
+.angular/
+# secrets: NEVER commit these
+.env
+.env.*
+!.env.example
+!.env.production.example
+!.env.local.example
+backend/.env
+# uploaded files, local database, backups
+storage/
+backups/
+*.log
+.DS_Store

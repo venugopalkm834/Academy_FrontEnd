@@ -1,0 +1,5 @@
+.form { padding: 26px; display: flex; flex-direction: column; gap: 14px; } .form h2 { color: var(--navy); }
+.form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; }
+.form input, .form select { padding: 10px 12px; border: 1px solid #c3cfe0; border-radius: 10px; font: 400 15px Poppins; } .form input:focus, .form select:focus { outline: 2px solid var(--yellow); }
+.err { color: var(--red); } small.err { font-size: 12px; } .links { display: flex; justify-content: space-between; font-size: 14px; color: var(--blue); margin: 0; }
+.note { padding: 10px 14px; border-radius: 10px; background: #e3eefc; font-size: 14px; } .note.err { background: #fde4e4; color: var(--red); } .note.ok { background: #dff5e7; color: #14703c; } .note.warn { background: #fff3cd; }

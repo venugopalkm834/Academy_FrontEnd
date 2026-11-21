@@ -1,0 +1,2 @@
+.pre { max-width: 100%; max-height: 140px; border-radius: 8px; margin-top: 6px; object-fit: cover; } .pre.sm { max-height: 110px; } .thumb { width: 100%; aspect-ratio: 16 / 5; object-fit: cover; border-radius: 8px; background: #e8f0fb; }
+.form { max-width: 860px; margin-bottom: 6px; } .chk { flex-direction: row; align-items: center; gap: 8px; } @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
