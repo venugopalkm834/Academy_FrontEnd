@@ -10,7 +10,7 @@ Needs Node.js 20+ (`node -v`). Login is by **mobile number** + password.
     npm install
     npm run setup
     npm run dev
-Open http://localhost:4200  (API on :4000). First install takes a few minutes.
+Open http://localhost:4200  (API on :5000). First install takes a few minutes.
 Or two terminals: `cd backend && npm install && npm run dev` / `cd frontend && npm install && npm start`.
 
 ## Logins (demo data is created automatically)
@@ -38,7 +38,7 @@ Or two terminals: `cd backend && npm install && npm run dev` / `cd frontend && n
 
 ### Online payment setup (Razorpay)
 1. Create a Razorpay account, copy the Key ID and Key Secret into `backend/.env` (`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`). Use test keys first.
-2. In the Razorpay dashboard add a webhook to `https://YOUR-DOMAIN/api/webhooks/razorpay` with events `payment.captured`, `order.paid`, `payment.failed`, `refund.processed`, and put the webhook secret in `RAZORPAY_WEBHOOK_SECRET`. (For local testing expose port 4000 with a tunnel such as ngrok.)
+2. In the Razorpay dashboard add a webhook to `https://YOUR-DOMAIN/api/webhooks/razorpay` with events `payment.captured`, `order.paid`, `payment.failed`, `refund.processed`, and put the webhook secret in `RAZORPAY_WEBHOOK_SECRET`. (For local testing expose port 5000 with a tunnel such as ngrok.)
 3. Without keys the **Pay now** button is hidden and members use the manual UPI / bank option.
 
 ### Aadhaar privacy
@@ -81,7 +81,7 @@ With the backend running, in another terminal: `cd backend && npm run check:flow
 - Forgot password: enter the mobile number; a reset link is emailed to the address on the account (no SMS gateway is configured).
 
 ## Troubleshooting
-- **Red bar "backend is out of date"**: an OLD backend is still running on port 4000. On Windows double-click `kill-ports.bat` (or run `netstat -ano | findstr :4000` then `taskkill /PID <pid> /F`), then `npm run dev`. Confirm http://localhost:4000/api/health shows `"version":"0.8.0"`.
+- **Red bar "backend is out of date"**: an OLD backend is still running on port 5000. On Windows double-click `kill-ports.bat` (or run `netstat -ano | findstr :5000` then `taskkill /PID <pid> /F`), then `npm run dev`. Confirm http://localhost:5000/api/health shows `"version":"0.8.0"`.
 - Backend start-up must print `Academic Club API v0.8.0 running` and `Seeded (admin, categories, settings, demo partners)`. If not, you are running an old backend folder.
 - A red bar at the top of the site means the backend is old or not running.
 - After every backend restart the in-memory database is reset (re-register, or use the demo logins). Use a real MongoDB to keep data.

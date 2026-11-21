@@ -17,5 +17,5 @@ RUN npm install --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
 RUN mkdir -p /data/storage && chown -R node:node /data /app
 USER node
-EXPOSE 4000
+EXPOSE 5000
 CMD ["node", "dist/server.js"]

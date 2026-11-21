@@ -1,6 +1,6 @@
 // End-to-end check of every main flow against a RUNNING backend:  npm run check:flow
 // Uses fresh random mobile numbers, changes the payment settings for the test and restores them at the end.
-const BASE = process.env.API || 'http://localhost:4000/api';
+const BASE = process.env.API || 'http://localhost:5000/api';
 const ADMIN = { mobile: process.env.ADMIN_PHONE || '9000000000', password: process.env.ADMIN_PASSWORD || 'Admin@12345' };
 const rnd = () => '9' + String(Math.floor(Math.random() * 1e9)).padStart(9, '0');
 let pass = 0, fail = 0;

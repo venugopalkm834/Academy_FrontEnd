@@ -15,7 +15,7 @@
 	# API, payment webhooks and public uploads go to the Node backend
 	@backend path /api/* /uploads/*
 	handle @backend {
-		reverse_proxy backend:4000
+		reverse_proxy backend:5000
 	}
 
 	# Everything else is the Angular app (single page app: unknown paths open index.html)
