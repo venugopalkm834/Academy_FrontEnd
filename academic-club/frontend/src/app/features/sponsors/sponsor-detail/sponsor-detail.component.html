@@ -1,0 +1,67 @@
+<section class="page wrap">
+  <a class="back" [routerLink]="['..']">← Back to services</a>
+  @if (error()) { <div class="note err">{{ error() }}</div> }
+  @if (d(); as s) {
+    <div class="cover" [style.background-image]="s.institution.coverUrl ? 'linear-gradient(#0a2a5588,#0a2a55dd), url(' + s.institution.coverUrl + ')' : null">
+      <span class="logo-sq big">@if (s.institution.logoUrl) { <img [src]="s.institution.logoUrl" alt=""> } @else { <span>{{ icon(s.institution.type) }}</span> }</span>
+      <div><h1>{{ s.institution.name }}</h1><span class="badge">{{ label(s.institution.type) }}</span> <span class="badge ok">✔ Approved partner</span> <span>📍 {{ s.institution.city }}</span></div>
+    </div>
+    @if (s.sponsored) { <span class="badge warn">⭐ Sponsored</span> }
+    @if (s.headline) { <p class="headline tagline">{{ s.headline }}</p> }
+    @if (s.adText) { <p>{{ s.adText }}</p> }
+
+    <div class="cols">
+      <div class="col-main">
+        @if (s.institution.description || s.institution.services.length) {
+          <div class="item">
+            <h3>About</h3>
+            @if (s.institution.description) { <p>{{ s.institution.description }}</p> }
+            <div>@for (x of s.institution.services; track x) { <span class="chip-static">{{ x }}</span> }</div>
+          </div>
+        }
+        <h2 class="sub">Offerings &amp; Fees</h2>
+        @if (!s.offerings.length) { <p class="empty">No offerings published yet.</p> }
+        @for (o of s.offerings; track o.id) {
+          <article class="item offering">
+            <div class="oh"><h3>{{ o.name }}</h3>@if (o.effectivePct) { <span class="off-badge">{{ o.effectivePct }}% OFF</span> }</div>
+            <p class="muted small">{{ o.className }} {{ o.duration ? '· ' + o.duration : '' }} {{ o.seats ? '· ' + o.seats + ' seats' : '' }}</p>
+            @if (o.imageUrl) { <img class="prev" [src]="o.imageUrl" alt=""> }
+            @if (o.description) { <p>{{ o.description }}</p> }
+            @if (o.feeStructure.length) {
+              <div class="fees">
+                @for (f of o.feeStructure; track f.label) { <div><span>{{ f.label }}</span><b>{{ f.amount | currency:'INR':'symbol':'1.0-0' }}</b></div> }
+              </div>
+            }
+            <div class="price">
+              <s>{{ o.originalFee | currency:'INR':'symbol':'1.0-0' }}</s>
+              <strong>{{ o.finalFee | currency:'INR':'symbol':'1.0-0' }}</strong>
+              @if (o.discountAmount) { <span class="save">You save {{ o.discountAmount | currency:'INR':'symbol':'1.0-0' }}</span> }
+            </div>
+            @if (o.admissionFee || o.additionalFees) { <small class="muted">Final price includes admission {{ o.admissionFee | currency:'INR':'symbol':'1.0-0' }} + other fees {{ o.additionalFees | currency:'INR':'symbol':'1.0-0' }}</small> }
+            @if (o.offerNote) { <p class="note ok">🎁 {{ o.offerNote }}</p> }
+            @if (auth.user()?.role === 'MEMBER') {
+              @if (acc()?.bookingPaymentRequired) { <small class="muted">A booking fee of {{ acc().bookingFee | currency:'INR':'symbol':'1.0-0' }} applies.</small> }
+              @else if (acc()?.inTrial && acc()?.requiredAt !== 'NONE') { <small class="muted">🎁 Free booking: {{ acc().daysLeft }} free day(s) left.</small> }
+              <button class="btn-sm green book" (click)="book(o)" [disabled]="booking() === o.id">{{ booking() === o.id ? 'Booking…' : 'Book now' }}</button>
+            } @else if (!auth.user()) {
+              <a class="btn-sm green book" routerLink="/login">Login to book</a>
+            }
+          </article>
+        }
+      </div>
+      <aside class="col-side">
+        <div class="item contact">
+          <h3>Contact</h3>
+          @if (s.institution.contactPerson) { <p>👤 {{ s.institution.contactPerson }}</p> }
+          @if (s.institution.address || s.institution.city) { <p>📍 {{ s.institution.address }} {{ s.institution.city }} {{ s.institution.pin }}</p> }
+          <div class="actions">
+            @if (s.institution.contactPhone) { <a class="btn-sm green" [href]="'tel:' + s.institution.contactPhone">📞 Call</a> }
+            @if (s.institution.email) { <a class="btn-sm" [href]="'mailto:' + s.institution.email">✉ Email</a> }
+            @if (s.institution.website) { <a class="btn-sm ghost" [href]="s.institution.website" target="_blank" rel="noopener">🌐 Website</a> }
+            <a class="btn-sm yellow" [href]="mapUrl(s.institution)" target="_blank" rel="noopener">🗺 Map</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+</section>

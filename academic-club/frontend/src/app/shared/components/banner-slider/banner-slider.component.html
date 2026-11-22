@@ -1,0 +1,26 @@
+@if (items().length) {
+  <section class="slider" (mouseenter)="pause(true)" (mouseleave)="pause(false)" (touchstart)="start($event)" (touchend)="end($event)" aria-roledescription="carousel" aria-label="Advertisements">
+    <div class="track" [style.transform]="'translateX(-' + idx() * 100 + '%)'">
+      @for (b of items(); track b.id) {
+        <div class="slide">
+          @if (b.linkUrl && isInternal(b.linkUrl)) {
+            <a [routerLink]="b.linkUrl" [attr.aria-label]="b.title || 'Advertisement'"><ng-container *ngTemplateOutlet="pic; context: { b: b }" /></a>
+          } @else if (b.linkUrl) {
+            <a [href]="b.linkUrl" target="_blank" rel="noopener sponsored" [attr.aria-label]="b.title || 'Advertisement'"><ng-container *ngTemplateOutlet="pic; context: { b: b }" /></a>
+          } @else { <ng-container *ngTemplateOutlet="pic; context: { b: b }" /> }
+        </div>
+      }
+    </div>
+    @if (items().length > 1) {
+      <button class="nav prev" type="button" (click)="go(-1)" aria-label="Previous">‹</button>
+      <button class="nav next" type="button" (click)="go(1)" aria-label="Next">›</button>
+      <div class="dots">@for (b of items(); track b.id; let i = $index) { <button type="button" [class.on]="i === idx()" (click)="set(i)" [attr.aria-label]="'Go to ad ' + (i + 1)"></button> }</div>
+    }
+  </section>
+}
+<ng-template #pic let-b="b">
+  <picture>
+    @if (b.mobileImageUrl) { <source media="(max-width: 640px)" [srcset]="b.mobileImageUrl"> }
+    <img [src]="b.imageUrl" [alt]="b.title || 'Advertisement'" loading="lazy">
+  </picture>
+</ng-template>

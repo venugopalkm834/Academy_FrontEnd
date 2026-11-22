@@ -1,0 +1,57 @@
+<main class="wrap narrow wide">
+  <form class="card form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <h2>Become a Member</h2>
+    <p class="muted small">Step 1: register. Step 2: log in and choose a membership plan to activate your membership and get your digital ID card.</p>
+
+    <h3>Personal details</h3>
+    <div class="grid">
+      <label class="full">Full name *<input formControlName="fullName" autocomplete="name">@if (bad('fullName')) { <small class="err">Enter your full name</small> }</label>
+      <label>I am a *<select formControlName="memberType"><option value="STUDENT">Student</option><option value="PARENT">Parent</option></select></label>
+      <label>Gender *<select formControlName="gender"><option value="">Select…</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>@if (bad('gender')) { <small class="err">Select gender</small> }</label>
+      <label>Mobile number * (used to log in)<input type="tel" inputmode="numeric" maxlength="10" formControlName="phone" autocomplete="tel">@if (bad('phone')) { <small class="err">Enter a valid 10-digit mobile number (starts with 6, 7, 8 or 9)</small> }</label>
+      <label>Email address *<input type="email" formControlName="email" autocomplete="email">@if (bad('email')) { <small class="err">Enter a valid email address</small> }</label>
+      <label>Date of birth *<input type="date" formControlName="dob" [max]="today">@if (bad('dob')) { <small class="err">Select your date of birth</small> }</label>
+      <label class="full">Full address *<textarea rows="2" formControlName="address" autocomplete="street-address"></textarea>@if (bad('address')) { <small class="err">Enter your full address</small> }</label>
+      <label>State *<select formControlName="state"><option value="">Select…</option>@for (s of states; track s) { <option [value]="s">{{ s }}</option> }</select>@if (bad('state')) { <small class="err">Select your state</small> }</label>
+      <label>District *<input formControlName="district">@if (bad('district')) { <small class="err">Enter your district</small> }</label>
+      <label>City *<input formControlName="city" autocomplete="address-level2">@if (bad('city')) { <small class="err">Enter your city</small> }</label>
+      <label>PIN code *<input inputmode="numeric" maxlength="6" formControlName="pin" autocomplete="postal-code">@if (bad('pin')) { <small class="err">Enter a valid 6-digit PIN code</small> }</label>
+    </div>
+
+    <h3>Education details</h3>
+    <div class="grid">
+      <label>{{ form.value.memberType === 'PARENT' ? "Child's education level *" : 'Education level *' }}
+        <select formControlName="educationLevel"><option value="">Select…</option>@for (l of levels; track l.value) { <option [value]="l.value">{{ l.label }}</option> }</select>
+        @if (bad('educationLevel')) { <small class="err">Select an education level</small> }</label>
+      <label>School / college (optional)<input formControlName="school"></label>
+    </div>
+    @if (planGroup()) { <p class="note">Your membership plans: <b>{{ planGroup() }}</b>. Fees are shown after you log in.</p> }
+
+    <h3>Identity verification</h3>
+    <label>Aadhaar number {{ requireAadhaar() ? '*' : '(optional)' }}
+      <input inputmode="numeric" maxlength="14" formControlName="aadhaar" autocomplete="off" placeholder="12-digit Aadhaar number">
+      @if (bad('aadhaar')) { <small class="err">Enter a valid 12-digit Aadhaar number</small> }</label>
+    <label class="chk"><input type="checkbox" formControlName="aadhaarConsent"> I consent to the secure use of my Aadhaar number for identity verification only. It is stored encrypted and never printed on the ID card.</label>
+
+    <h3>Selfie / photo *</h3>
+    <div class="photo-box">
+      <div class="preview">@if (photoPreview()) { <img [src]="photoPreview()" alt="Your photo preview"> } @else { <span>👤</span> }</div>
+      <div class="photo-actions">
+        <label class="btn-sm yellow file">📷 Take selfie<input type="file" accept="image/*" capture="user" (change)="onPhoto($event)" hidden></label>
+        <label class="btn-sm ghost file">🖼 Upload photo<input type="file" accept="image/png,image/jpeg" (change)="onPhoto($event)" hidden></label>
+        @if (photoBusy()) { <small class="muted">Uploading…</small> } @else if (photoPreview()) { <small class="ok-text">✔ Photo ready. Check the preview.</small> } @else { <small class="muted">A clear, front-facing photo. JPG or PNG.</small> }
+      </div>
+    </div>
+
+    <h3>Create password</h3>
+    <div class="grid">
+      <label>Password *<input type="password" formControlName="password" autocomplete="new-password">@if (bad('password')) { <small class="err">Min 8 characters, 1 uppercase letter and 1 number</small> }</label>
+      <label>Confirm password *<input type="password" formControlName="confirmPassword" autocomplete="new-password">@if (form.errors?.['mismatch'] && form.controls.confirmPassword.touched) { <small class="err">Passwords do not match</small> }</label>
+    </div>
+    <label class="chk"><input type="checkbox" formControlName="acceptTerms"> I accept the Terms and Conditions</label>
+    <label class="chk"><input type="checkbox" formControlName="acceptPrivacy"> I accept the Privacy Policy</label>
+    @if (err()) { <div class="note err">{{ err() }}</div> }
+    <button class="btn-blue" [disabled]="busy() || photoBusy()">{{ busy() ? 'Registering…' : 'Register' }}</button>
+    <p class="links"><a routerLink="/login">Already a member? Log in</a></p>
+  </form>
+</main>

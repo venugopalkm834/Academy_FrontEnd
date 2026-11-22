@@ -1,0 +1,2 @@
+.price { font-size: 26px; font-weight: 700; color: var(--red); margin: 0; } .form { max-width: 820px; margin-bottom: 6px; } .chk { flex-direction: row; align-items: center; gap: 8px; }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }

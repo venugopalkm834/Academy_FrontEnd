@@ -1,0 +1,28 @@
+<div class="topbar"><div class="wrap row">
+  <span>🎓 Learn <b>•</b> Grow <b>•</b> Achieve</span>
+  <span class="tb-links">@if (!auth.user()) { <a routerLink="/member/register">Become a Member</a>|<a routerLink="/partner/register">Register Your Institution</a>| }<a routerLink="/contact">Contact Us</a></span>
+</div></div>
+<header class="header"><div class="wrap row">
+  <a routerLink="/" class="logo"><span class="logo-mark">📖</span><span><b>The Academic Club</b><small>Education • Skills • Opportunities</small></span></a>
+  <button class="burger" (click)="open = !open" aria-label="Menu">☰</button>
+  <nav [class.open]="open" (click)="open = false">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    @if (auth.user()?.role !== 'PARTNER') { <a routerLink="/partners" routerLinkActive="active">Find Services</a> }
+    <a routerLink="/about" routerLinkActive="active">About Us</a>
+    <a routerLink="/contact" routerLinkActive="active">Contact</a>
+    @if (auth.user(); as u) {
+      <a [routerLink]="home(u.role)" class="btn-yellow sm">My Dashboard</a>
+      <button type="button" class="btn-blue sm" (click)="auth.logout()">Logout</button>
+    } @else {
+      <a routerLink="/partner/login" class="btn-blue sm">Partner Login</a>
+      <a routerLink="/login" class="btn-yellow sm">Member Login</a>
+    }
+  </nav>
+</div></header>
+<router-outlet />
+<footer class="footer"><div class="wrap row">
+  <div class="logo light"><span class="logo-mark">📖</span><b>The Academic Club</b></div>
+  <p class="tag"><i>Together for a Smarter, Stronger and Successful Future</i></p>
+  <div class="social"><span style="background:#e62117">▶</span><span style="background:#1877f2">f</span><span style="background:#d6249f">◎</span><span style="background:#27a7e7">➤</span><span style="background:#0a66c2">in</span></div>
+</div>
+<div class="wrap legal"><a routerLink="/about">About Us</a><a routerLink="/contact">Contact</a>@if (!auth.user()) { <a routerLink="/member/register">Become a Member</a><a routerLink="/partner/register">Partner Registration</a><a routerLink="/partner/login">Partner Login</a><a routerLink="/admin/login">Admin Login</a> }</div></footer>

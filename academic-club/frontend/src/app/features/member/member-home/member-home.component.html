@@ -1,0 +1,20 @@
+<ac-banner-slider placement="MEMBER" />
+<h1 class="page-title">Hello, {{ auth.user()?.firstName }} 👋</h1>
+@if (acc(); as a) {
+  @if (a.inTrial && a.requiredAt !== 'NONE') { <div class="note ok">🎁 Free access: {{ a.daysLeft }} day(s) left.</div> }
+  @if (a.needsMembershipPayment) { <div class="note warn">Your free period has ended. <a routerLink="../membership"><b>Pay the membership fee ({{ a.membershipFee | currency:'INR':'symbol':'1.0-0' }}) →</b></a></div> }
+  @if (a.requiredAt === 'BOOKING' && !a.inTrial) { <div class="note">A booking fee of {{ a.bookingFee | currency:'INR':'symbol':'1.0-0' }} applies when you book a course.</div> }
+}
+@if (acc(); as m) {
+  @if (!m.membershipActive) { <div class="note warn">🪪 Activate your membership to get your digital ID card and member-only offers. <a routerLink="../membership"><b>Choose a plan →</b></a></div> }
+  @else { <div class="note ok">✔ Active member. <a routerLink="../id-card"><b>View my ID card →</b></a></div> }
+}
+<p class="muted">What service are you looking for today?</p>
+<div class="search">
+  <input type="search" placeholder="Search yoga, dance classes, school admission…" [value]="q()" (input)="q.set($any($event.target).value)" (keyup.enter)="go()">
+  <button class="btn-blue sm" (click)="go()">Search</button>
+</div>
+<div class="cats">
+  @for (t of types; track t.value) { <button class="cat" (click)="pick(t.value)"><span>{{ t.icon }}</span>{{ t.label }}</button> }
+</div>
+<ac-ad-strip base="/member/services" />

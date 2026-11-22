@@ -1,0 +1,33 @@
+<h1 class="page-title no-print">My ID Card</h1>
+@if (loading()) { <p class="empty">Loading…</p> }
+@if (error()) { <div class="note warn no-print">{{ error() }} <a routerLink="../membership"><b>Choose a membership plan →</b></a></div> }
+@if (card(); as c) {
+  <div class="print-area">
+    <div class="idcard">
+      <div class="id-head"><div class="brand"><span class="mark">📖</span><div><b>THE ACADEMIC CLUB</b><small>Education • Skills • Opportunities</small></div></div><span class="tag">MEMBERSHIP ID CARD</span></div>
+      <div class="stripe"></div>
+      <div class="id-body">
+        <div class="photo">@if (c.photo) { <img [src]="c.photo" alt="Member photo"> } @else { <span>👤</span> }</div>
+        <div class="info">
+          <h2>{{ c.fullName }}</h2>
+          <div class="lbl">MEMBER ID</div><div class="mid">{{ c.memberId }}</div>
+          <div class="facts">
+            <div><span>TYPE</span><b>{{ c.memberType === 'PARENT' ? 'Parent' : 'Student' }}</b></div>
+            <div><span>EDUCATION</span><b>{{ c.education }}</b></div>
+            <div><span>MOBILE</span><b>{{ c.mobile }}</b></div>
+            <div><span>CITY / PIN</span><b>{{ c.city }} {{ c.pin }}</b></div>
+          </div>
+        </div>
+        <div class="qr"><img [src]="c.qr" alt="Verification QR code"><small>Scan to verify</small>
+          <span class="st" [class.ok]="c.status === 'ACTIVE'" [class.bad]="c.status === 'EXPIRED' || c.status === 'SUSPENDED'">{{ c.status }}</span></div>
+      </div>
+      <div class="addr">Address: {{ c.address }}</div>
+      <div class="id-foot">{{ c.planName }} · Valid from {{ c.startsAt | date:'dd MMM yyyy' }} · {{ c.lifetime ? 'Lifetime' : 'Valid until ' + (c.validUntil | date:'dd MMM yyyy') }}</div>
+    </div>
+  </div>
+  <div class="actions no-print no-print-gap">
+    <button class="btn-sm green" (click)="pdf()" [disabled]="busy()">{{ busy() ? 'Preparing…' : '⬇ Download PDF' }}</button>
+    <button class="btn-sm ghost" (click)="print()">🖨 Print</button>
+    @if (c.status !== 'ACTIVE') { <a class="btn-sm yellow" routerLink="../membership">Renew membership</a> }
+  </div>
+}

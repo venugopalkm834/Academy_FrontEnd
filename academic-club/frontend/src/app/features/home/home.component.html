@@ -1,0 +1,48 @@
+<ac-banner-slider placement="HOME" />
+<section class="hero">@if (img) { <img class="hero-img" src="hero.svg" alt="" (error)="img = false"> }<div class="wrap hero-in">
+  <div class="hero-text">
+    <h1>Your Learning Partner for a<em>Brighter Future</em></h1>
+    <p>Get Exclusive Discounts on Courses, Classes and Activities through <b>The Academic Club</b></p>
+    @if (!isPartner()) { <a routerLink="/partners" class="btn-yellow">Explore Offers →</a> }
+    @if (!auth.user()) {
+        <a routerLink="/member/register" class="btn-outline">Join The Academic Club</a>
+        <a routerLink="/partner/register" class="btn-outline">Register Your Institution</a>
+      }
+  </div>
+  <div class="ribbon"><small>UP TO</small><strong>50%</strong><span>DISCOUNT</span></div>
+</div></section>
+
+<ac-stat-counters />
+
+@if (ads().length && !isPartner()) {
+<section class="wrap"><div class="pill-title"><span>Our Proud Sponsors</span></div>
+  <div class="sponsors card">@for (a of ads(); track a.id) { <a class="sp" [routerLink]="['/partners', a.institution.id]"><span class="ico">{{ icon(a.institution.type) }}</span><b>{{ a.institution.name }}</b><small>{{ a.headline }}</small></a> }</div></section>
+}
+
+@if (!isPartner()) {
+<section class="wrap"><div class="pill-title"><span>Our Club Offers</span></div>
+  <div class="offers">@for (o of offers; track o.name) {
+    <article class="offer" [style.background]="'linear-gradient(160deg,' + o.c1 + ',' + o.c2 + ')'">
+      <div class="o-ico">{{ o.ico }}</div><h3>{{ o.name }}</h3>
+      <div class="off">Upto<br><b>50% OFF</b></div>
+      <a [routerLink]="['/partners']" [queryParams]="{ type: o.type }" class="o-btn">{{ o.cta }} →</a>
+    </article> }</div></section>
+}
+
+@if (!isPartner()) {
+<section class="wrap"><div class="featured">
+  <div class="ft-title">Featured Partner Institute</div>
+  <div class="ft-logo"><span>🎓</span><b>EduNext</b><em>Institute</em><small>Learn Today… Lead Tomorrow</small></div>
+  <div class="ft-mid"><h3>Spoken English &amp; Communication Skills</h3>
+    <p class="ticks">✔ Personality Development &nbsp;✔ Interview Preparation &nbsp;✔ Public Speaking</p>
+    <div class="price"><div class="orig">Original Price<s>₹10,000</s></div><span class="arrow">→</span>
+      <div class="club">Club Price<strong>₹5,000</strong><b>Upto 50% OFF</b></div></div></div>
+  <div class="ft-why"><h4>Why Choose This Offer?</h4><ul><li>Expert Trainers</li><li>Flexible Batches</li><li>Certificate Provided</li><li>Career Guidance</li></ul>
+    <a routerLink="/partners" class="btn-blue block">Claim Discount Now →</a></div>
+</div></section>
+}
+
+<section class="benefits"><div class="wrap row">
+  <div class="b-list">@for (b of benefits; track b.t) { <div class="b"><span>{{ b.i }}</span>{{ b.t }}</div> }</div>
+  <div class="b-cta"><h3>Be a Member Today!</h3><p>Unlock More Benefits &amp; Savings…</p>@if (auth.user(); as u) { <a [routerLink]="home(u.role)" class="btn-yellow">Go to your dashboard →</a> } @else { <a routerLink="/member/register" class="btn-yellow">Join The Academic Club →</a> }</div>
+</div></section>

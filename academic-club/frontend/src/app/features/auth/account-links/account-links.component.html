@@ -1,0 +1,10 @@
+<main class="wrap narrow"><form class="card form" [formGroup]="f" (ngSubmit)="go()">
+  @switch (mode) {
+    @case ('forgot') { <h2>Forgot Password</h2><label>Registered mobile number<input type="tel" inputmode="numeric" formControlName="mobile" placeholder="10-digit mobile number"><small class="muted">We email a reset link to the address on your account.</small></label> }
+    @case ('reset') { <h2>Reset Password</h2><label>New password<input type="password" formControlName="password" autocomplete="new-password"><small class="muted">Min 8 chars, 1 uppercase, 1 number</small></label> }
+    @default { <h2>Email Verification</h2> }
+  }
+  @if (msg()) { <div class="note ok">{{ msg() }}</div> } @if (err()) { <div class="note err">{{ err() }}</div> }
+  @if (mode !== 'verify') { <button class="btn-blue" [disabled]="f.invalid || busy()">Submit</button> }
+  <p class="links"><a routerLink="/login">Back to login</a></p>
+</form></main>

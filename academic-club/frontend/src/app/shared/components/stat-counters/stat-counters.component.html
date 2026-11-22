@@ -1,0 +1,6 @@
+@if (ready()) {
+  <section class="counters wrap">
+    <div class="counter"><span class="ico">🎓</span><b>{{ fmt(members()) }}{{ plusM() ? '+' : '' }}</b><span class="lbl">Registered Students</span></div>
+    <div class="counter"><span class="ico">🏫</span><b>{{ fmt(institutes()) }}{{ plusI() ? '+' : '' }}</b><span class="lbl">Partner Institutions</span></div>
+  </section>
+}

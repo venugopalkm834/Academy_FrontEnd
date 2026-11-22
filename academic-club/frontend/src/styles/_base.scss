@@ -1,0 +1,11 @@
+* { box-sizing: border-box; } html, body { margin: 0; }
+body { font-family: Poppins, system-ui, sans-serif; color: #0d2342; background: var(--bg); }
+a { color: inherit; text-decoration: none; } h1, h2, h3, h4 { margin: 0; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; } .wrap.narrow { max-width: 460px; padding-top: 40px; padding-bottom: 40px; } .wrap.narrow.wide { max-width: 860px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; } .grow { flex: 1; }
+.card { background: #fff; border-radius: var(--r); box-shadow: 0 4px 18px #062b5520; }
+.muted { color: #5b6b82; } .block { display: block; text-align: center; }
+.logo { display: flex; align-items: center; gap: 10px; } .logo-mark { font-size: 34px; } .logo b { display: block; color: var(--blue); font-size: 22px; line-height: 1.1; } .logo small { color: var(--blue); font-size: 11px; }
+.logo.light b { color: #fff; font-size: 18px; }
+.burger { display: none; background: none; border: 0; font-size: 26px; cursor: pointer; } .burger.dark { color: var(--navy); }
+@media (max-width: 900px) { .burger { display: block; } }

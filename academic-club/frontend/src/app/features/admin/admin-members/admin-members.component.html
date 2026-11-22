@@ -1,0 +1,32 @@
+<div class="toolbar"><h1 class="page-title grow">Members</h1><button class="btn-sm yellow" (click)="export()">⬇ Export CSV</button></div>
+<div class="search"><input type="search" placeholder="Search name, mobile, member ID, PIN or city" [value]="q()" (input)="q.set($any($event.target).value)" (keyup.enter)="go()"><button class="btn-blue sm" (click)="go()">Search</button></div>
+<div class="filters">
+  <select class="field-input" [value]="memberType()" (change)="memberType.set($any($event.target).value); go()"><option value="">Students and parents</option><option value="STUDENT">Students</option><option value="PARENT">Parents</option></select>
+  <select class="field-input" [value]="membership()" (change)="membership.set($any($event.target).value); go()"><option value="">Any membership</option><option value="ACTIVE">Active</option><option value="EXPIRED">Expired</option><option value="PENDING">Payment pending</option><option value="NONE">Not paid</option></select>
+</div>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (!loading() && !items().length) { <p class="empty">No members found.</p> }
+<p class="muted small">{{ total() }} member(s)</p>
+<div class="list">
+  @for (m of items(); track m._id) {
+    <article class="item" [class.wide]="open()?._id === m._id">
+      <div class="oh"><h3>{{ m.name }}</h3><span class="badge" [class.ok]="m.membershipStatus === 'ACTIVE'" [class.warn]="m.membershipStatus === 'PENDING' || m.membershipStatus === 'NONE'" [class.bad]="m.membershipStatus === 'EXPIRED' || m.status === 'SUSPENDED'">{{ m.status === 'SUSPENDED' ? 'SUSPENDED' : m.membershipStatus === 'NONE' ? 'NOT PAID' : m.membershipStatus }}</span></div>
+      <p class="small"><span class="badge">{{ m.memberType === 'PARENT' ? 'Parent' : 'Student' }}</span> {{ m.education }}<br>📞 {{ m.phone }} · ✉ {{ m.email }}<br>📍 {{ m.city }} {{ m.pin }}@if (m.membershipId) { <br>🪪 {{ m.membershipId }} · {{ m.planName }} }</p>
+      <div class="actions">
+        <button class="btn-sm ghost" (click)="view(m)">{{ open()?._id === m._id ? 'Hide' : 'View profile' }}</button>
+        @if (m.status === 'ACTIVE') { <button class="btn-sm red" (click)="setStatus(m, 'SUSPENDED')">Suspend</button> } @else { <button class="btn-sm green" (click)="setStatus(m, 'ACTIVE')">Reactivate</button> }
+      </div>
+      @if (open(); as o) { @if (o._id === m._id) {
+        <div class="detail">
+          <div class="pic">@if (photo()) { <img [src]="photo()" alt="Member photo"> } @else { <span>👤</span> }</div>
+          <div class="small">Gender: {{ o.gender }} · DOB: {{ o.dob | date:'mediumDate' }}<br>Address: {{ o.address }}, {{ o.city }}, {{ o.district }}, {{ o.state }} {{ o.pin }}<br>School / college: {{ o.school || '-' }}<br>Aadhaar: <b>{{ o.aadhaarMasked || 'not provided' }}</b> (masked)
+            <br>Registered: {{ o.createdAt | date:'medium' }}@if (o.validUntil) { <br>Valid until {{ o.validUntil | date:'mediumDate' }} } @if (o.lifetime) { <br>Lifetime member }</div>
+          @if (o.payments.length) {
+            <div class="pays"><b>Payments</b>@for (p of o.payments; track p._id) { <div class="small">{{ p.createdAt | date:'dd MMM yyyy' }} · {{ p.purpose }} · {{ p.amount | currency:'INR':'symbol':'1.0-0' }} · {{ p.status === 'APPROVED' ? 'Successful' : p.status }}</div> }</div>
+          }
+        </div>
+      } }
+    </article>
+  }
+</div>
+@if (pages() > 1) { <div class="pager"><button class="btn-sm ghost" [disabled]="page() <= 1" (click)="turn(-1)">← Prev</button><span class="small">Page {{ page() }} of {{ pages() }}</span><button class="btn-sm ghost" [disabled]="page() >= pages()" (click)="turn(1)">Next →</button></div> }

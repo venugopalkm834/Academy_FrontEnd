@@ -1,0 +1,5 @@
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: center; margin-bottom: 4px; .field-input { margin: 0; } .clear { justify-self: start; } }
+.top { display: flex; gap: 12px; align-items: center; } .addr { margin: 0; }
+.mini { margin: 0; padding-left: 18px; font-size: 13px; color: #44546a; }
+.foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 6px; }
+.more { margin-left: auto; color: var(--blue); font-weight: 600; font-size: 13px; }

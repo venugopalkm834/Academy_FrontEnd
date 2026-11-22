@@ -1,0 +1,6 @@
+.dash { display: flex; min-height: 100vh; } .side { width: 250px; background: var(--navy); color: #fff; padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.side .role { color: var(--yellow); margin: 10px 8px 12px; letter-spacing: 1px; } .side a:not(.logo) { padding: 10px 14px; border-radius: 10px; font-size: 14px; } .side a.active, .side a:not(.logo):hover { background: #ffffff1f; border-left: 4px solid var(--yellow); }
+
+@media (max-width: 900px) {
+  .side { position: fixed; inset: 0 auto 0 0; transform: translateX(-100%); transition: transform 0.2s; z-index: 30; &.open { transform: none; } }
+}

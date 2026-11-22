@@ -1,0 +1,6 @@
+// Global styles only: design tokens, base, buttons, form primitives. Each component owns its own .scss.
+@use 'styles/variables';
+@use 'styles/base';
+@use 'styles/buttons';
+@use 'styles/forms';
+@use 'styles/ui';

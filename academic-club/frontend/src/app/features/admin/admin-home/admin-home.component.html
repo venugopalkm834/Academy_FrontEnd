@@ -1,0 +1,38 @@
+<h1 class="page-title">Admin Dashboard</h1>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (d(); as x) {
+  <h2 class="sub">Members</h2>
+  <div class="stats">
+    <a class="stat" routerLink="../members"><b>{{ x.members }}</b><span>Registered members</span></a>
+    <a class="stat" routerLink="../members"><b>{{ x.students }}</b><span>Students</span></a>
+    <a class="stat" routerLink="../members"><b>{{ x.parents }}</b><span>Parents</span></a>
+    <a class="stat" routerLink="../members"><b>{{ x.activeMembers }}</b><span>Active members</span></a>
+    <a class="stat" routerLink="../members"><b>{{ x.lifetimeMembers }}</b><span>Lifetime members</span></a>
+    <a class="stat" routerLink="../members"><b>{{ x.expiredMembers }}</b><span>Expired members</span></a>
+  </div>
+  <h2 class="sub">Partners</h2>
+  <div class="stats">
+    <a class="stat" routerLink="../partners"><b>{{ x.partners }}</b><span>Partners</span></a>
+    <a class="stat" routerLink="../partners"><b>{{ x.activePartners }}</b><span>Approved partners</span></a>
+    <a class="stat" routerLink="../partners"><b>{{ x.institutes }}</b><span>Institutes</span></a>
+    <a class="stat" routerLink="../offerings"><b>{{ x.approvedOfferings }}</b><span>Live offerings</span></a>
+    <a class="stat" routerLink="../sponsors"><b>{{ x.sponsors }}</b><span>Active sponsors</span></a>
+  </div>
+  <h2 class="sub">Needs your attention</h2>
+  <div class="stats">
+    <a class="stat hot" routerLink="../partners"><b>{{ x.pendingPartners }}</b><span>Partners to approve</span></a>
+    <a class="stat hot" routerLink="../offerings"><b>{{ x.pendingOfferings }}</b><span>Offerings to approve</span></a>
+    <a class="stat hot" routerLink="../payments"><b>{{ x.pendingPayments }}</b><span>Payments to verify</span></a>
+    <a class="stat hot" routerLink="../sponsor-requests"><b>{{ x.pendingSponsorRequests }}</b><span>Sponsor requests</span></a>
+  </div>
+  <h2 class="sub">Payments and revenue</h2>
+  <div class="stats">
+    <a class="stat" routerLink="../payments"><b>{{ x.successfulPayments }}</b><span>Successful payments</span></a>
+    <a class="stat" routerLink="../payments"><b>{{ x.failedPayments }}</b><span>Failed payments</span></a>
+    <div class="stat"><b>{{ x.revenue.total | currency:'INR':'symbol':'1.0-0' }}</b><span>Total revenue</span></div>
+    <div class="stat"><b>{{ x.revenue.membership | currency:'INR':'symbol':'1.0-0' }}</b><span>Membership</span></div>
+    <div class="stat"><b>{{ x.revenue.partner | currency:'INR':'symbol':'1.0-0' }}</b><span>Partner listings</span></div>
+    <div class="stat"><b>{{ x.revenue.sponsorship | currency:'INR':'symbol':'1.0-0' }}</b><span>Sponsorship</span></div>
+  </div>
+  <div class="actions"><a class="btn-sm yellow" routerLink="../plans">Membership plans</a><a class="btn-sm ghost" routerLink="../settings">Payment settings</a></div>
+}

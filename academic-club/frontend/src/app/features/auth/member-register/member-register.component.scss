@@ -1,0 +1,5 @@
+.photo-box { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.preview { width: 120px; height: 150px; border-radius: 12px; border: 2px dashed #c3cfe0; display: grid; place-items: center; font-size: 46px; background: #f3f7fc; overflow: hidden; img { width: 100%; height: 100%; object-fit: cover; } }
+.photo-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; } .file { cursor: pointer; } .ok-text { color: var(--green); font-weight: 600; }
+.chk { align-items: flex-start; line-height: 1.4; input { margin-top: 3px; } }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }

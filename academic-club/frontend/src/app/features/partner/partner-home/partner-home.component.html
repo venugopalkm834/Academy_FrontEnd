@@ -1,0 +1,19 @@
+<h1 class="page-title">Welcome{{ d() ? ', ' + d().name : '' }}</h1>
+@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (d(); as x) {
+  @if (x.approval === 'PENDING') { <div class="note warn">⏳ Your institution is waiting for admin approval. You can complete your profile and draft offerings now; submit them once approved.</div> }
+  @if (x.approval === 'REJECTED') { <div class="note err">Registration not approved: {{ x.rejectionReason }}</div> }
+  @if (x.listing?.needsPayment) { <div class="note warn">💳 A listing fee is required before you can submit offerings. <a routerLink="../plans"><b>Plans &amp; Payments →</b></a></div> }
+  @if (x.listing?.inTrial && x.listing?.fee > 0) { <div class="note ok">🎁 Free listing: {{ x.listing.daysLeft }} day(s) left.</div> }
+  @if (x.sponsored) { <div class="note ok">⭐ You are currently a featured sponsor. Members see your ad in their panel.</div> }
+  @if (!x.profileComplete) { <div class="note">Add a description, phone number and logo so members can find you. <a routerLink="../profile"><b>Complete profile →</b></a></div> }
+  <h2 class="sub">The Academic Club network</h2>
+  <ac-stat-counters />
+  <div class="stats">
+    <div class="stat"><b>{{ x.counts.APPROVED || 0 }}</b><span>Live offerings</span></div>
+    <div class="stat"><b>{{ x.counts.PENDING_APPROVAL || 0 }}</b><span>Awaiting approval</span></div>
+    <div class="stat"><b>{{ x.counts.DRAFT || 0 }}</b><span>Drafts</span></div>
+    <div class="stat"><b>{{ x.counts.REJECTED || 0 }}</b><span>Rejected</span></div>
+  </div>
+  <div class="actions"><a class="btn-yellow sm" routerLink="../offerings/new">+ Add offering</a><a class="btn-sm ghost" routerLink="../profile">Edit profile</a><a class="btn-sm ghost" routerLink="../offerings">My offerings</a><a class="btn-sm yellow" routerLink="../plans">Plans &amp; payments</a></div>
+}
