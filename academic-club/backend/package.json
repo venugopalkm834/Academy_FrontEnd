@@ -8,7 +8,8 @@
     "start": "node dist/server.js",
     "seed": "tsx src/seed/seed.ts",
     "test": "npm run build && node logic.test.js",
-    "check:flow": "node scripts/flow-check.mjs"
+    "check:flow": "node scripts/flow-check.mjs",
+    "serve": "tsx src/server.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

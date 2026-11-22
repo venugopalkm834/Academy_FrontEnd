@@ -73,6 +73,7 @@ cd /opt/academic-club && git pull && docker compose up -d --build
 **Without Docker** (best while developing): see README.md (`npm install`, `npm run setup`, `npm run dev`, site on http://localhost:4200).
 
 ## 8. Troubleshooting
+* **Red bar "Cannot reach the backend" on the live site**: the backend container is not healthy. Run `docker compose ps` and `docker compose logs --tail=80 backend`. The most common causes: `AADHAAR_KEY` still `CHANGE_ME...` (it must be exactly 64 hex characters: `openssl rand -hex 32`), `MONGO_PASSWORD` containing `@ : / #`, or a blank required value in `.env`. After fixing `.env` run `docker compose up -d`.
 * **Site not opening / no HTTPS**: DNS must point to the server first; check `docker compose logs web`. Ports 80 and 443 must be open.
 * **Backend keeps restarting**: `docker compose logs backend`. A missing value in `.env` is reported by name.
 * **Build fails with "heap out of memory"**: add swap (step 2.1).

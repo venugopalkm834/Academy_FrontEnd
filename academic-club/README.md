@@ -6,6 +6,14 @@ Needs Node.js 20+ (`node -v`). Login is by **mobile number** + password.
 
 **Going live on theacademicclub.com, Docker, Git: see DEPLOY.md.**
 
+## Easiest start: one command
+    npm install
+    npm run setup        (installs backend + frontend packages, first time and after updates)
+    npm start            (starts the backend, waits until it answers, then starts the website)
+Open http://localhost:4200. Something wrong? Run `npm run doctor`: it checks Node, packages, backend/.env and whether the backend answers, and tells you what to fix.
+
+**One process, one port** (no proxy, closest to the live site): `npm run serve` builds the website and the backend then serves BOTH on http://localhost:5000.
+
 ## Run (from this folder)
     npm install
     npm run setup
@@ -81,6 +89,7 @@ With the backend running, in another terminal: `cd backend && npm run check:flow
 - Forgot password: enter the mobile number; a reset link is emailed to the address on the account (no SMS gateway is configured).
 
 ## Troubleshooting
+- **Red bar "Cannot reach the backend"**: the backend is not running or crashed on start. Run `npm run doctor`, then `npm start` and read the FIRST red line of the backend output (the usual causes: packages not installed -> `npm run setup`; `AADHAAR_KEY` not 64 hex characters; port 5000 already used -> `kill-ports.bat`). If you changed `proxy.conf.json` or the port, restart `npm start`.
 - **Red bar "backend is out of date"**: an OLD backend is still running on port 5000. On Windows double-click `kill-ports.bat` (or run `netstat -ano | findstr :5000` then `taskkill /PID <pid> /F`), then `npm run dev`. Confirm http://localhost:5000/api/health shows `"version":"0.8.0"`.
 - Backend start-up must print `Academic Club API v0.8.0 running` and `Seeded (admin, categories, settings, demo partners)`. If not, you are running an old backend folder.
 - A red bar at the top of the site means the backend is old or not running.
