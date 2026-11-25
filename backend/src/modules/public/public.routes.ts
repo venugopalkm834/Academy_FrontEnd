@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isValidObjectId } from 'mongoose';
-import { Banner, Sponsor, Course, Partner, Institution, User, Membership } from '../../models';
+import { Entertainment, EntertainmentBooking, Banner, Sponsor, Course, Partner, Institution, User, Membership } from '../../models';
 import { membershipView, publicCount } from '../../services/membership';
 import { readPrivateImage } from '../../services/files';
 import { HttpError, wrap } from '../../middleware';
@@ -102,5 +102,23 @@ r.get('/banners', wrap(async (req, res) => {
   const placement = req.query.placement === 'MEMBER' ? 'MEMBER' : 'HOME';
   const items: any[] = await Banner.find({ ...liveFilter(), placement: { $in: ['ALL', placement] } }).sort('order -createdAt').limit(10).lean();
   res.json({ items: items.map((b) => ({ id: b._id, title: b.title, imageUrl: b.imageUrl, mobileImageUrl: b.mobileImageUrl, linkUrl: b.linkUrl })) });
+}));
+
+// Contact details the admin entered (shown on the site, in member / academy panels and behind the WhatsApp button)
+const waNumber = (v: string) => { const d = String(v || '').replace(/\D/g, ''); return d.length === 10 ? '91' + d : d.startsWith('0') ? '91' + d.slice(1) : d; };
+r.get('/contact', wrap(async (_req, res) => {
+  const s = await getSettings(); const c = s.site || {}; const n = waNumber(c.whatsapp);
+  res.json({ email: c.contactEmail || '', whatsapp: c.whatsapp || '', phone: c.contactPhone || '', address: c.address || '', hours: c.workingHours || '',
+    whatsappLink: n ? `https://wa.me/${n}?text=${encodeURIComponent(c.whatsappMessage || 'Hello, I need help with The Academic Club.')}` : '' });
+}));
+
+// Club Entertainment slider (home page, member panel). Past events and expired listings are hidden.
+r.get('/entertainment', wrap(async (_req, res) => {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const items: any[] = await Entertainment.find({ ...liveFilter(), deletedAt: null, $or: [{ eventDate: null }, { eventDate: { $gte: today } }] }).sort('order eventDate -createdAt').limit(30).lean();
+  const used: any[] = await EntertainmentBooking.aggregate([{ $match: { entertainment: { $in: items.map((i) => i._id) }, status: { $in: ['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'CONFIRMED'] } } }, { $group: { _id: '$entertainment', n: { $sum: '$qty' } } }]);
+  const map = new Map(used.map((u) => [String(u._id), u.n]));
+  res.json({ items: items.map((i) => ({ id: i._id, title: i.title, subtitle: i.subtitle, description: i.description, imageUrl: i.imageUrl, venue: i.venue, eventDate: i.eventDate, eventTime: i.eventTime,
+    price: i.price, maxPerBooking: i.maxPerBooking, seatsLeft: i.capacity > 0 ? Math.max(0, i.capacity - (map.get(String(i._id)) || 0)) : null })) });
 }));
 export default r;

@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import { User, Membership } from '../models';
@@ -15,6 +17,7 @@ export async function cardData(userId: string): Promise<any | null> {
     verifyUrl, photo: await readPrivateImage(u.photoKey), qr: await QRCode.toDataURL(verifyUrl, { margin: 1, width: 240 }) };
 }
 
+const LOGO = path.resolve(__dirname, '../../assets/logo.png'); // backend/assets/logo.png
 const fmt = (d?: Date) => (d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-');
 // Aadhaar is never part of the card data, so it can never be printed.
 export async function cardPdf(c: any): Promise<Buffer> {
@@ -25,8 +28,10 @@ export async function cardPdf(c: any): Promise<Buffer> {
   const statusColor = c.status === 'ACTIVE' ? '#1f9d55' : c.status === 'EXPIRED' ? '#d62828' : '#c77700';
   doc.rect(0, 0, 486, 306).fill('#ffffff');
   doc.rect(0, 0, 486, 58).fill(navy); doc.rect(0, 58, 486, 4).fill(yellow);
-  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text('THE ACADEMIC CLUB', 20, 12, { lineBreak: false });
-  doc.fillColor(yellow).font('Helvetica').fontSize(8).text('Education  -  Skills  -  Opportunities', 20, 38, { lineBreak: false });
+  let tx = 20;
+  if (fs.existsSync(LOGO)) { doc.roundedRect(14, 7, 72, 44, 8).fill('#ffffff'); try { doc.image(LOGO, 18, 10, { fit: [64, 38], align: 'center', valign: 'center' }); tx = 98; } catch { /* logo unreadable: text only */ } }
+  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text('THE ACADEMIC CLUB', tx, 12, { lineBreak: false });
+  doc.fillColor(yellow).font('Helvetica').fontSize(8).text('Education  -  Skills  -  Opportunities', tx, 38, { lineBreak: false });
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9).text('MEMBERSHIP ID CARD', 20, 24, { width: 446, align: 'right', lineBreak: false });
   if (c.photo) { try { doc.image(Buffer.from(c.photo.split(',')[1], 'base64'), 22, 78, { fit: [105, 130], align: 'center', valign: 'center' }); } catch { /* unsupported image */ } }
   doc.lineWidth(2).strokeColor(navy).rect(22, 78, 105, 130).stroke();

@@ -1,2 +1,0 @@
-.uploads { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); b { display: block; margin-bottom: 4px; } input[type='file'] { max-width: 100%; font-size: 13px; } small { display: block; margin-top: 4px; } }
-@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }

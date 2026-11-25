@@ -1,9 +1,0 @@
-**/node_modules
-**/dist
-**/.angular
-.git
-storage
-backups
-**/.env
-**/.env.*
-backend

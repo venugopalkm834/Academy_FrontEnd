@@ -19,7 +19,7 @@ else {
 const api = await port(5000);
 if (!api) bad('nothing is listening on port 5000: the backend is NOT running', 'run: npm start   (read the first red error in the backend output)');
 else {
-  try { const h = await (await fetch('http://127.0.0.1:5000/api/health')).json(); ok(`backend answers: v${h.version}, database ${h.db?.name} (${h.db?.mode})`); }
+  try { const h = await (await fetch('http://127.0.0.1:5000/api/health')).json(); h.version === '0.12.0' ? ok(`backend answers: v${h.version}, database ${h.db?.name} (${h.db?.mode})`) : bad(`the running backend is v${h.version || 'old'} (folder: ${h.folder || 'unknown'}) but this project is v0.12.0`, 'stop it (kill-ports.bat) and start the backend from THIS folder: npm start'); }
   catch { bad('port 5000 is used by another program that is not this backend', 'run kill-ports.bat, then npm start'); }
 }
 (await port(4200)) ? ok('website dev server on port 4200 is running') : console.log('  - website dev server (4200) not running (fine if you use: npm run serve)');

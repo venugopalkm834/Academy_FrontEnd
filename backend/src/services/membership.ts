@@ -1,7 +1,6 @@
 import crypto from 'crypto';
-import { Membership, MembershipPlan, Notification, User } from '../models';
+import { Membership, MembershipPlan, Notification } from '../models';
 import { nextSeq } from './counter';
-import { sendMail } from './mail';
 
 export function membershipView(m: any, now = new Date()) {
   if (!m) return { status: 'NONE', lifetime: false } as any;
@@ -35,6 +34,5 @@ export async function activateMembership(payment: any): Promise<string> {
   const until = plan.kind === 'LIFETIME' ? 'lifetime' : `valid until ${m.expiresAt.toDateString()}`;
   const msg = `Your membership payment was successful. Member ID ${m.membershipId} (${plan.name}, ${until}). Your digital ID card is ready in My ID Card.`;
   await Notification.create({ user: payment.user, title: 'Membership activated', body: msg });
-  const u: any = await User.findById(payment.user).select('email'); if (u?.email) sendMail(u.email, 'The Academic Club: membership activated', `<p>${msg}</p>`).catch(() => {});
   return msg;
 }

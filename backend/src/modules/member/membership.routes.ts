@@ -9,6 +9,7 @@ import { computeAccess } from '../../services/access';
 import { membershipView, activateMembership } from '../../services/membership';
 import { createOrder, fetchPayment, gatewayEnabled, gatewayKeyId, verifyCheckoutSignature } from '../../services/gateway';
 import { settleGatewayPayment } from '../../services/settle';
+import { onPaymentSubmitted } from '../../services/events';
 import { cardData, cardPdf } from '../../services/idcard';
 import { EDU_LEVELS, educationGroup } from '../../services/education';
 import { maskAadhaar } from '../../services/aadhaar';
@@ -82,6 +83,7 @@ r.post('/membership/pay-manual', validate(z.object({ planId: z.string(), transac
   if (await Payment.exists({ user: req.user!.id, purpose: 'MEMBERSHIP', status: 'UNDER_REVIEW' })) throw new HttpError(409, 'Your previous payment is still under review.');
   const p = await Payment.create({ user: req.user!.id, purpose: 'MEMBERSHIP', plan: plan._id, amount: plan.price, method: 'MANUAL', status: 'UNDER_REVIEW', transactionId: req.body.transactionId, proofKey: req.body.proofKey });
   await Membership.updateOne({ user: req.user!.id, status: { $ne: 'ACTIVE' } }, { status: 'PENDING' }, { upsert: true });
+  await onPaymentSubmitted(p);
   res.status(201).json(p);
 }));
 

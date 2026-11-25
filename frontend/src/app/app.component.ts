@@ -1,8 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { APP_VERSION } from './core/config/version';
 import { ApiService } from './core/services/api.service';
 
-const REQUIRED_API = '0.9.0';
+const REQUIRED_API = APP_VERSION;
 
 @Component({ selector: 'ac-root', imports: [RouterOutlet], templateUrl: './app.component.html', styleUrl: './app.component.scss' })
 export class AppComponent implements OnInit {

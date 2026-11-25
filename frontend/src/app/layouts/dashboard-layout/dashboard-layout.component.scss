@@ -4,3 +4,17 @@
 @media (max-width: 900px) {
   .side { position: fixed; inset: 0 auto 0 0; transform: translateX(-100%); transition: transform 0.2s; z-index: 30; &.open { transform: none; } }
 }
+
+.side { overflow-y: auto; } .side .ic { display: inline-block; width: 26px; } .out { margin-top: auto; background: #ffffff1a; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font: 500 14px Poppins; cursor: pointer; text-align: left; }
+.dtop { position: sticky; top: 0; z-index: 20; } .home-link { font-weight: 700; color: var(--navy); font-size: 15px; } .scrim { display: none; }
+.bottom { display: none; }
+@media (min-width: 901px) { .dbody { max-width: 1100px; margin-inline: auto; } .home-link { display: none; } }
+@media (max-width: 900px) {
+  .side.open { box-shadow: 0 0 0 100vmax #0007; } .scrim { display: block; position: fixed; inset: 0; z-index: 25; }
+  .side { width: min(290px, 84vw); } .who { display: none; } .dtop .btn-blue { display: none; }
+  .dbody { padding: 14px 12px 96px; }
+  .bottom { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 24; background: #fff; border-top: 1px solid #d6e2f3; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 14px #062b5518;
+    a, button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 7px; font: 500 10.5px Poppins; color: #5b6b82; background: none; border: 0; cursor: pointer; min-height: 56px; justify-content: center; text-align: center; line-height: 1.15; span { font-size: 20px; } }
+    a.active { color: var(--navy); font-weight: 700; box-shadow: inset 0 3px 0 var(--yellow); } }
+}
+.verside { color: #ffffff77; font-size: 11px; text-align: center; margin-top: 6px; }

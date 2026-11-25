@@ -3,6 +3,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
 import { PaymentFormComponent } from '../../../shared/components/payment-form/payment-form.component';
+import { shrinkImage } from '../../../core/utils/image';
 import { errText } from '../../../core/utils/error.util';
 
 const LABEL: Record<string, string> = { PENDING_PAYMENT: 'Payment needed', PAYMENT_REVIEW: 'Verifying payment', PENDING_APPROVAL: 'Waiting for admin', ACTIVE: 'Live', REJECTED: 'Rejected', CANCELLED: 'Cancelled' };
@@ -13,18 +14,19 @@ export class PartnerPlansComponent implements OnInit {
   private api = inject(ApiService);
   d = signal<any>(null); error = signal(''); busy = signal(false); payingId = signal('');
   label = (s: string) => LABEL[s] || s;
-  form = this.fb.nonNullable.group({ headline: ['', [Validators.required, Validators.minLength(2)]], adText: [''], imageUrl: [''] });
+  form = this.fb.nonNullable.group({ kind: ['BANNER'], headline: ['', [Validators.required, Validators.minLength(2)]], adText: [''], imageUrl: [''], mobileImageUrl: [''], linkUrl: ['', Validators.pattern(/^(https?:\/\/\S+|\/\S*)?$/)] });
 
   ngOnInit() { this.load(); }
   async load() { try { this.d.set(await this.api.get('/partner/plans')); } catch (e) { this.error.set(errText(e)); } }
-  async pickImage(ev: Event) {
-    const f = (ev.target as HTMLInputElement).files?.[0]; if (!f) return;
-    try { this.form.patchValue({ imageUrl: (await this.api.upload(f)).url }); } catch (e) { this.error.set(errText(e)); }
+  async pickImage(ev: Event, field: 'imageUrl' | 'mobileImageUrl' = 'imageUrl') {
+    const f = (ev.target as HTMLInputElement).files?.[0]; if (!f) return; this.error.set('');
+    try { const blob = await shrinkImage(f, field === 'imageUrl' ? 1600 : 900); this.form.patchValue({ [field]: (await this.api.upload(new File([blob], 'ad.jpg', { type: 'image/jpeg' }))).url } as any); } catch (e) { this.error.set(errText(e)); }
   }
   async request() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.busy.set(true); this.error.set('');
-    const b: any = { ...this.form.getRawValue() }; if (!b.imageUrl) delete b.imageUrl; if (!b.adText) delete b.adText;
+    const b: any = { ...this.form.getRawValue() }; for (const k of ['imageUrl', 'mobileImageUrl', 'adText', 'linkUrl']) if (!b[k]) delete b[k];
+    if (b.kind === 'BANNER' && !b.imageUrl) { this.error.set('Please upload the banner image.'); this.busy.set(false); return; }
     try { const sr = await this.api.post('/partner/sponsor-requests', b); this.form.reset(); if (sr.status === 'PENDING_PAYMENT') this.payingId.set(sr._id); await this.load(); }
     catch (e) { this.error.set(errText(e)); } finally { this.busy.set(false); }
   }

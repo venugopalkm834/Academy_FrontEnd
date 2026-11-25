@@ -4,8 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import { DB_MODE } from './config/db';
 import { env } from './config/env';
-import publicRoutes from './modules/public/public.routes'; import partnerRoutes from './modules/partner/partner.routes'; import paymentsRoutes from './modules/payments/payments.routes'; import membershipRoutes from './modules/member/membership.routes'; import webhookRoutes from './modules/webhooks/webhooks.routes'; import adminMembershipRoutes from './modules/admin/admin.membership.routes'; import memberRoutes from './modules/member/member.routes'; import adminRoutes from './modules/admin/admin.routes'; import uploadRoutes, { UPLOAD_DIR } from './modules/upload/upload.routes'; import authRoutes from './modules/auth/auth.routes'; import { errorHandler, auditMutations } from './middleware';
-export const VERSION = '0.9.0'; // bump when the API changes; the frontend warns if it talks to an older backend
+import publicRoutes from './modules/public/public.routes'; import partnerRoutes from './modules/partner/partner.routes'; import paymentsRoutes from './modules/payments/payments.routes'; import membershipRoutes from './modules/member/membership.routes'; import webhookRoutes from './modules/webhooks/webhooks.routes'; import adminMembershipRoutes from './modules/admin/admin.membership.routes'; import notificationRoutes from './modules/notifications/notifications.routes'; import adminEmailRoutes from './modules/admin/admin.email.routes'; import memberEntertainmentRoutes from './modules/member/member.entertainment.routes'; import adminEntertainmentRoutes from './modules/admin/admin.entertainment.routes'; import memberRoutes from './modules/member/member.routes'; import adminRoutes from './modules/admin/admin.routes'; import uploadRoutes, { UPLOAD_DIR } from './modules/upload/upload.routes'; import authRoutes from './modules/auth/auth.routes'; import { errorHandler, auditMutations } from './middleware';
+export const VERSION = '0.12.0'; // bump when the API changes; the frontend warns if it talks to an older backend
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }), cors({ origin: env.client, credentials: true }), express.json({ limit: '1mb', verify: (req: any, _res, buf) => { req.rawBody = buf; } }), cookieParser(), auditMutations);
@@ -17,11 +17,15 @@ app.use('/api/public', publicRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/partner', partnerRoutes);
 app.use('/api/member', membershipRoutes);
+app.use('/api/member', memberEntertainmentRoutes);
 app.use('/api/member', memberRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/admin', adminMembershipRoutes); // before adminRoutes: its dashboard / members / payments list replace the older ones
+app.use('/api/admin', adminEmailRoutes);
+app.use('/api/admin', adminEntertainmentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
 // Single-process mode: if the Angular app has been built (npm run build in frontend), this server also serves the website,
 // so http://localhost:5000 shows the site and the API together (no second server, no proxy, no CORS).
 const WEB_DIST = process.env.FRONTEND_DIST ? path.resolve(process.env.FRONTEND_DIST) : path.resolve(process.cwd(), '..', 'frontend', 'dist', 'academic-club', 'browser');

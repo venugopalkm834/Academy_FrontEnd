@@ -121,6 +121,46 @@ await step('admin adds a banner ad and it shows in the public slider', async () 
   await call('POST', '/admin/banners', { imageUrl: '/uploads/x.jpg', linkUrl: 'javascript:alert(1)' }, S.admin, 400); // unsafe links are rejected
   await call('DELETE', `/admin/banners/${b._id}`, null, S.admin);
 });
+await step('admin sets contact details; they are public and give a WhatsApp link', async () => {
+  await call('PUT', '/admin/site', { contactEmail: 'info@academicclub.com', whatsapp: '9876543210', address: 'Test address', emailFrom: 'info@academicclub.com' }, S.admin);
+  const c = await call('GET', '/public/contact'); if (!c.whatsappLink.startsWith('https://wa.me/919876543210')) throw new Error('bad WhatsApp link: ' + c.whatsappLink); if (c.email !== 'info@academicclub.com') throw new Error('email missing');
+  await call('PUT', '/admin/site', { whatsapp: 'abc' }, S.admin, 400);
+});
+await step('admin was notified about the new member, new academy and the booking (bell)', async () => {
+  const n = await call('GET', '/notifications', null, S.admin); const t = n.items.map((x) => x.title).join('|');
+  for (const need of ['New member registered', 'New academy registered', 'New booking']) if (!t.includes(need)) throw new Error('missing admin notification: ' + need);
+  await call('PUT', '/notifications/read-all', {}, S.admin);
+});
+await step('member and academy were notified about the confirmed booking', async () => {
+  const m = await call('GET', '/notifications', null, S.member); if (!m.items.some((x) => x.title === 'Booking confirmed')) throw new Error('member not notified');
+  const p = await call('GET', '/notifications', null, S.partner); if (!p.items.some((x) => x.title === 'New booking')) throw new Error('academy not notified');
+});
+await step('email templates: list, edit, reset', async () => {
+  const l = await call('GET', '/admin/email-templates', null, S.admin); if (l.items.length < 5) throw new Error('templates missing');
+  await call('PUT', '/admin/email-templates/booking_member', { subject: 'Booked: {{courseName}}', body: 'Hi {{name}}, your booking {{bookingNo}} is confirmed.', enabled: true }, S.admin);
+  const again = await call('GET', '/admin/email-templates', null, S.admin); if (again.items.find((x) => x.key === 'booking_member').subject !== 'Booked: {{courseName}}') throw new Error('edit not saved');
+  await call('DELETE', '/admin/email-templates/booking_member', null, S.admin);
+});
+await step('academy requests a banner ad, pays with a screenshot; admin approves; it shows on the home slider', async () => {
+  const sr = await call('POST', '/partner/sponsor-requests', { kind: 'BANNER', headline: 'Academy banner test', imageUrl: '/uploads/academy.jpg', linkUrl: 'https://example.com' }, S.partner, 201);
+  await call('POST', '/partner/sponsor-requests', { kind: 'BANNER', headline: 'No image' }, S.partner, 409); // one request at a time
+  await call('POST', `/partner/sponsor-requests/${sr._id}/pay`, { transactionId: 'BAN' + Date.now(), proofKey: await proof(S.partner) }, S.partner, 201);
+  await call('PUT', `/admin/sponsor-requests/${sr._id}/review`, { action: 'approve' }, S.admin);
+  const b = await call('GET', '/public/banners?placement=HOME'); if (!b.items.some((x) => x.title === 'Academy banner test')) throw new Error('banner not live');
+});
+await step('Club Entertainment: admin lists an event; it shows publicly; member books, pays, admin approves', async () => {
+  const ev = await call('POST', '/admin/entertainment', { title: 'Flow Comedy Night', subtitle: 'Live show', venue: 'Town Hall', price: 250, capacity: 3, maxPerBooking: 5, imageUrl: '/uploads/e.jpg' }, S.admin, 201);
+  const pub = await call('GET', '/public/entertainment'); const item = pub.items.find((x) => x.title === 'Flow Comedy Night'); if (!item || item.seatsLeft !== 3) throw new Error('event not public or wrong seats: ' + JSON.stringify(item));
+  await call('POST', '/member/entertainment/bookings', { entertainmentId: ev._id, qty: 4 }, S.member, 409); // only 3 seats
+  const b = await call('POST', '/member/entertainment/bookings', { entertainmentId: ev._id, qty: 2 }, S.member, 201); if (b.status !== 'PENDING_PAYMENT' || b.amount !== 500) throw new Error('booking: ' + JSON.stringify(b));
+  if ((await call('GET', '/public/entertainment')).items.find((x) => x.id === ev._id).seatsLeft !== 1) throw new Error('seats not reserved');
+  await call('POST', `/member/entertainment/bookings/${b._id}/pay`, { transactionId: 'ENT' + Date.now(), proofKey: await proof(S.member) }, S.member, 201);
+  const l = await call('GET', '/admin/payments?status=UNDER_REVIEW&purpose=ENTERTAINMENT', null, S.admin); const p = l.items.find((x) => x.user?.phone === S.mm); if (!p) throw new Error('payment not shown to admin');
+  await call('PUT', `/admin/payments/${p._id}/review`, { action: 'approve' }, S.admin);
+  const mine = await call('GET', '/member/entertainment/bookings', null, S.member); if (mine.items[0].status !== 'CONFIRMED') throw new Error('not confirmed');
+  const nb = await call('GET', '/notifications', null, S.admin); if (!nb.items.some((x) => x.title === 'New Club Entertainment booking')) throw new Error('admin not notified');
+  await call('DELETE', `/admin/entertainment/${ev._id}`, null, S.admin);
+});
 await step('admin settings restored', async () => {
   const s = S.settings; await call('PUT', '/admin/settings', { paymentRequiredAt: s.paymentRequiredAt || 'NONE', freeTrialDays: s.freeTrialDays ?? 7, membershipFee: s.membershipFee ?? 999, membershipValidityDays: s.membershipValidityDays ?? 365, bookingFee: s.bookingFee ?? 0,
     partnerFreeDays: s.partnerFreeDays ?? 30, partnerListingFee: s.partnerListingFee ?? 0, listingValidityDays: s.listingValidityDays ?? 365, partnerSponsorFee: s.partnerSponsorFee ?? 0, sponsorDurationDays: s.sponsorDurationDays ?? 30,

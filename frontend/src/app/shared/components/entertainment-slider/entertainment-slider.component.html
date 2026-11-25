@@ -1,0 +1,33 @@
+@if (items().length) {
+  <section class="wrap ent" (mouseenter)="pause(true)" (mouseleave)="pause(false)" (touchstart)="pause(true)">
+    <div class="pill"><span>🎭 Club Entertainment</span></div>
+    <div class="frame">
+      @if (items().length > 1) { <button type="button" class="nav prev" (click)="move(-1)" aria-label="Previous">‹</button> }
+      <div class="track" #track>
+        @for (e of items(); track e.id) {
+          <article class="card-e">
+            <div class="pic" [style.background-image]="e.imageUrl ? 'url(' + e.imageUrl + ')' : null">@if (!e.imageUrl) { <span>🎭</span> }
+              <span class="price">{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}</span></div>
+            <div class="body">
+              <h3>{{ e.title }}</h3>
+              @if (e.subtitle) { <p class="sub">{{ e.subtitle }}</p> }
+              <p class="meta">@if (e.eventDate) { 📅 {{ e.eventDate | date:'EEE, d MMM y' }} {{ e.eventTime }}<br> } @if (e.venue) { 📍 {{ e.venue }} }</p>
+              <div class="foot">
+                @if (e.seatsLeft !== null) { <span class="seats" [class.low]="e.seatsLeft <= 5">{{ e.seatsLeft > 0 ? e.seatsLeft + ' seats left' : 'Sold out' }}</span> }
+                @if (e.seatsLeft === 0) { <span class="btn-sm off">Sold out</span> }
+                @else { <a class="btn-yellow sm" routerLink="/member/entertainment" [queryParams]="{ book: e.id }">Book now</a> }
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+      @if (items().length > 1) { <button type="button" class="nav next" (click)="move(1)" aria-label="Next">›</button> }
+    </div>
+  </section>
+}
+@if (loaded() && !items().length) {
+  <section class="wrap ent">
+    <div class="pill"><span>🎭 Club Entertainment</span></div>
+    <div class="frame empty-e"><p>🎬 Exciting shows and events for Academic Club members are coming soon.</p></div>
+  </section>
+}

@@ -15,6 +15,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
+COPY assets ./assets
 RUN mkdir -p /data/storage && chown -R node:node /data /app
 USER node
 EXPOSE 5000

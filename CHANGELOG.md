@@ -1,0 +1,22 @@
+# What is in each version, and where to see it
+
+Check your copy first: the footer of the website shows **v0.12.0** and the backend start-up line says `Academic Club API v0.12.0 running`. `npm run doctor` also checks this. If you see an older number, you are running an old copy: replace the whole folder with this one, run `npm run setup`, then `npm start`.
+
+On a fresh start the database is filled with demo content so every feature is visible straight away (only when `SEED_DEMO` is not `false`): a WhatsApp number, 3 Club Entertainment events, 2 banner ads, 6 demo academies.
+Admin login: mobile `9000000000` / `Admin@12345` (from backend/.env).
+
+| # | Request | Where to find it |
+|---|---|---|
+| 1 | WhatsApp contact icon | Green round icon bottom-right on every page. Tapping it opens WhatsApp chat with the admin's number. (Hidden only if no WhatsApp number is set.) |
+| 2 | Admin sets email, WhatsApp, address | Admin > **Contact & Email Settings**. Shown on the Contact page, footer, and **Help & Contact** in the member and academy panels |
+| 3 | Academy ad requests with payment screenshot | Academy login > **Plans, Ads & Payments** > "Advertise on the main page". Admin approves in **Ad Requests** |
+| 4 | Forms centred | All forms in member, academy and admin panels |
+| 5 | Mobile and responsive | Phone: bottom menu bar in every panel, big touch targets. Try the browser at phone width |
+| 6 | Admin notified on registration and every booking | Bell icon (top bar) in the admin panel + email to the admin alert address |
+| 7 | "Academy Login" | Header and footer of the website, and the login page title |
+| 8 | Emails via Resend, wording editable | Set `RESEND_API_KEY` in .env. Admin > **Email Templates** (edit, test, switch on/off) |
+| 9 | ID card on WhatsApp | Member > **My ID Card** > "Share on WhatsApp" (and "Share PDF" on phones) |
+| 10 | Club Entertainment replaces "Featured Partner Institute" | Bottom of the home page (slides). Admin > **Club Entertainment** (add any number, edit, bookings, approve). Member > **Club Entertainment** to book and pay |
+| 11 | New logo, no background | Header, footer, sidebar, ID card (screen and PDF), emails and the browser tab icon. Files: `frontend/public/logo.png`, `backend/assets/logo.png` |
+
+To change the logo later, replace those two files (keep a transparent PNG) and the two icon files `favicon.png` and `apple-touch-icon.png` in `frontend/public`.

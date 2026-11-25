@@ -5,6 +5,7 @@ import { authenticate, requireRole, validate, wrap, HttpError } from '../../midd
 import { applyPrice } from '../../services/course-pricing';
 import { getSettings } from '../../services/settings';
 import { computeListing } from '../../services/access';
+import { onPaymentSubmitted } from '../../services/events';
 
 const r = Router(); r.use(authenticate, requireRole('PARTNER'));
 // Finds the partner's profile; creates any missing piece (accounts made by older versions had no institution record).
@@ -90,7 +91,7 @@ r.get('/plans', wrap(async (req, res) => {
   const listingPays = pays.filter((p) => p.purpose === 'LISTING');
   res.json({ approval: partner.approval, listing: computeListing(s, partner),
     listingPaymentPending: listingPays.some((p) => p.status === 'UNDER_REVIEW'), listingRejection: listingPays.filter((p) => p.status === 'REJECTED').pop()?.rejectionReason,
-    sponsorFee: s.partnerSponsorFee || 0, sponsorDurationDays: s.sponsorDurationDays || 30,
+    sponsorFee: s.partnerSponsorFee || 0, sponsorDurationDays: s.sponsorDurationDays || 30, bannerFee: s.partnerBannerFee || 0, bannerDurationDays: s.bannerDurationDays || 30,
     requests: requests.map((x) => ({ ...x, payment: (() => { const p = pays.filter((y) => String(y.sponsorRequest) === String(x._id)).pop(); return p ? { status: p.status, rejectionReason: p.rejectionReason } : null; })() })) });
 }));
 r.post('/listing/pay', validate(payBody), wrap(async (req, res) => {
@@ -98,16 +99,18 @@ r.post('/listing/pay', validate(payBody), wrap(async (req, res) => {
   if (!(s.partnerListingFee > 0)) throw new HttpError(400, 'Listing is free right now.');
   if (l.active) throw new HttpError(400, 'Your listing is already active.');
   if (await Payment.exists({ user: req.user!.id, purpose: 'LISTING', status: 'UNDER_REVIEW' })) throw new HttpError(409, 'Your previous payment is still under review.');
-  await Payment.create({ user: req.user!.id, purpose: 'LISTING', amount: s.partnerListingFee, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
-  partner.listingStatus = 'PENDING'; await partner.save(); res.status(201).json({ message: 'Payment submitted for verification' });
+  const lp = await Payment.create({ user: req.user!.id, purpose: 'LISTING', amount: s.partnerListingFee, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
+  await onPaymentSubmitted(lp); partner.listingStatus = 'PENDING'; await partner.save(); res.status(201).json({ message: 'Payment submitted for verification' });
 }));
-const requestSchema = z.object({ headline: z.string().min(2).max(120), adText: z.string().max(300).optional(), imageUrl: z.string().max(300).optional() });
+const requestSchema = z.object({ kind: z.enum(['SPONSOR', 'BANNER']).default('SPONSOR'), headline: z.string().min(2).max(120), adText: z.string().max(300).optional(), imageUrl: z.string().max(300).optional(), mobileImageUrl: z.string().max(300).optional(),
+  linkUrl: z.string().max(500).optional().refine((v) => !v || /^(https?:\/\/|\/)/.test(v), 'The link must start with https:// or /') });
 r.post('/sponsor-requests', validate(requestSchema), wrap(async (req, res) => {
   const { partner, institution } = await ctx(req);
-  if (partner.approval !== 'APPROVED') throw new HttpError(400, 'Your institution must be approved before you can request sponsorship.');
-  if (await SponsorRequest.exists({ institution: institution._id, status: { $in: ['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PENDING_APPROVAL'] } })) throw new HttpError(409, 'You already have a sponsorship request in progress.');
-  const s = await getSettings(); const fee = s.partnerSponsorFee || 0;
-  res.status(201).json(await SponsorRequest.create({ ...req.body, institution: institution._id, partner: partner._id, amount: fee, durationDays: s.sponsorDurationDays || 30, status: fee > 0 ? 'PENDING_PAYMENT' : 'PENDING_APPROVAL' }));
+  if (partner.approval !== 'APPROVED') throw new HttpError(400, 'Your academy must be approved before you can request an ad.');
+  if (await SponsorRequest.exists({ institution: institution._id, status: { $in: ['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PENDING_APPROVAL'] } })) throw new HttpError(409, 'You already have an ad request in progress.');
+  const banner = req.body.kind === 'BANNER'; if (banner && !req.body.imageUrl) throw new HttpError(400, 'Please upload the banner image.');
+  const s = await getSettings(); const fee = (banner ? s.partnerBannerFee : s.partnerSponsorFee) || 0;
+  res.status(201).json(await SponsorRequest.create({ ...req.body, institution: institution._id, partner: partner._id, amount: fee, durationDays: (banner ? s.bannerDurationDays : s.sponsorDurationDays) || 30, status: fee > 0 ? 'PENDING_PAYMENT' : 'PENDING_APPROVAL' }));
 }));
 const mineRequest = async (req: Request) => {
   const { institution } = await ctx(req); const sr: any = await SponsorRequest.findOne({ _id: req.params.id, institution: institution._id });
@@ -116,8 +119,8 @@ const mineRequest = async (req: Request) => {
 r.post('/sponsor-requests/:id/pay', validate(payBody), wrap(async (req, res) => {
   const sr = await mineRequest(req);
   if (sr.status !== 'PENDING_PAYMENT') throw new HttpError(400, 'This request does not need a payment.');
-  await Payment.create({ user: req.user!.id, purpose: 'SPONSORSHIP', sponsorRequest: sr._id, amount: sr.amount, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
-  sr.status = 'PAYMENT_REVIEW'; sr.note = undefined; await sr.save(); res.status(201).json(sr);
+  const sp = await Payment.create({ user: req.user!.id, purpose: 'SPONSORSHIP', sponsorRequest: sr._id, amount: sr.amount, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
+  await onPaymentSubmitted(sp); sr.status = 'PAYMENT_REVIEW'; sr.note = undefined; await sr.save(); res.status(201).json(sr);
 }));
 r.post('/sponsor-requests/:id/cancel', wrap(async (req, res) => {
   const sr = await mineRequest(req);

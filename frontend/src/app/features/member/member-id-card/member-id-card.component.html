@@ -4,7 +4,7 @@
 @if (card(); as c) {
   <div class="print-area">
     <div class="idcard">
-      <div class="id-head"><div class="brand"><span class="mark">📖</span><div><b>THE ACADEMIC CLUB</b><small>Education • Skills • Opportunities</small></div></div><span class="tag">MEMBERSHIP ID CARD</span></div>
+      <div class="id-head"><div class="brand"><img class="logo-img on-dark" src="/logo.png" alt="The Academic Club logo"><div><b>THE ACADEMIC CLUB</b><small>Education • Skills • Opportunities</small></div></div><span class="tag">MEMBERSHIP ID CARD</span></div>
       <div class="stripe"></div>
       <div class="id-body">
         <div class="photo">@if (c.photo) { <img [src]="c.photo" alt="Member photo"> } @else { <span>👤</span> }</div>
@@ -28,6 +28,8 @@
   <div class="actions no-print no-print-gap">
     <button class="btn-sm green" (click)="pdf()" [disabled]="busy()">{{ busy() ? 'Preparing…' : '⬇ Download PDF' }}</button>
     <button class="btn-sm ghost" (click)="print()">🖨 Print</button>
+    <a class="btn-sm wa" [href]="waLink()" target="_blank" rel="noopener">💬 Share on WhatsApp</a>
+    @if (canShareFile()) { <button class="btn-sm ghost" (click)="sharePdf()" [disabled]="busy()">📤 Share PDF</button> }
     @if (c.status !== 'ACTIVE') { <a class="btn-sm yellow" routerLink="../membership">Renew membership</a> }
   </div>
 }
