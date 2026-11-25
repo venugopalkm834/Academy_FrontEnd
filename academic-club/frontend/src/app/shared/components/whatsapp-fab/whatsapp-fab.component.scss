@@ -1,0 +1,5 @@
+.fab { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60; width: 56px; height: 56px; border-radius: 50%; background: #25d366; color: #fff; display: grid; place-items: center; box-shadow: 0 6px 18px #0004; animation: pulse 2.4s infinite;
+  &:hover { background: #1ebe5a; transform: scale(1.06); } &.lift { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .tip { position: absolute; right: 64px; background: #0d2342; color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; } &:hover .tip { opacity: 1; } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 #25d36688, 0 6px 18px #0004; } 70% { box-shadow: 0 0 0 14px #25d36600, 0 6px 18px #0004; } 100% { box-shadow: 0 0 0 0 #25d36600, 0 6px 18px #0004; } }
+@media (max-width: 900px) { .tip { display: none; } }

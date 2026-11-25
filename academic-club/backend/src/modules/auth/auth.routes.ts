@@ -5,6 +5,7 @@ import { User, Partner, Institution, Membership, Session, Role, INST_TYPES } fro
 import { wrap, validate, authenticate, HttpError } from '../../middleware';
 import { sendMail } from '../../services/mail';
 import { getSettings } from '../../services/settings';
+import { onRegistered } from '../../services/events';
 import { mobileField } from '../../services/mobile';
 import fs from 'fs'; import path from 'path';
 import { PRIVATE_DIR } from '../../config/storage';
@@ -57,6 +58,7 @@ r.post('/member/register', validate(memberSchema), wrap(async (req, res) => {
   const u = await User.create({ ...d, ...ident, firstName: first, lastName: rest.join(' '), role: 'MEMBER', qualification: d.educationLevel, educationGroup: educationGroup(d.educationLevel),
     passwordHash: await bcrypt.hash(password, 12), verifyTokenHash: sha(t), acceptedTermsAt: new Date() });
   await Membership.create({ user: u._id, status: 'NONE', trialEndsAt: new Date(Date.now() + (st.freeTrialDays || 0) * 864e5) }); await sendVerify(u, t);
+  await onRegistered('MEMBER', u, d.memberType === 'PARENT' ? 'a parent' : 'a student');
   res.status(201).json({ message: 'Registered successfully. Log in with your mobile number, then choose a membership plan to get your ID card.' });
 }));
 
@@ -66,6 +68,7 @@ r.post('/partner/register', validate(partnerSchema), wrap(async (req, res) => {
   const p = await Partner.create({ user: u._id, institutionName, institutionType, contactName: d.contactName, website, trialEndsAt: new Date(Date.now() + ((await getSettings()).partnerFreeDays || 0) * 864e5) });
   await Institution.create({ partner: p._id, name: institutionName, type: institutionType, address: d.address, city: d.city, state: d.state, pin: d.pin, contactPerson: d.contactName, contactPhone: d.phone, email: d.email, website });
   await sendVerify(u, t);
+  await onRegistered('PARTNER', u, institutionName);
   res.status(201).json({ message: 'Registration received. Your account is pending admin approval.' });
 }));
 

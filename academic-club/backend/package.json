@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "serve": "tsx src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start:prod": "node dist/server.js",
     "seed": "tsx src/seed/seed.ts",
     "test": "npm run build && node logic.test.js",
-    "check:flow": "node scripts/flow-check.mjs",
-    "serve": "tsx src/server.ts"
+    "check:flow": "node scripts/flow-check.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

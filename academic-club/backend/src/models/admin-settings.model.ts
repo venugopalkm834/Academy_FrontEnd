@@ -10,11 +10,13 @@ export const AdminSettings = model('AdminSettings', new Schema({
   bookingFee: { type: Number, min: 0, default: 0 },
   // Partners: Plan A normal listing (free days, fee, validity) and Plan B featured sponsorship (fee, how long the ad runs). 0 = free
   partnerFreeDays: { type: Number, min: 0, default: 30 }, partnerListingFee: { type: Number, min: 0, default: 0 }, listingValidityDays: { type: Number, min: 1, default: 365 },
+  partnerBannerFee: { type: Number, min: 0, default: 0 }, bannerDurationDays: { type: Number, min: 1, default: 30 }, // Plan C: partner image banner ad
+  emailFrom: S, notifyEmail: S, // sender address of automatic emails (e.g. info@academicclub.com) and where admin alerts are emailed
   partnerSponsorFee: { type: Number, min: 0, default: 0 }, sponsorDurationDays: { type: Number, min: 1, default: 30 },
   upiId: S, upiQrUrl: S, showQr: { type: Boolean, default: true }, showBank: { type: Boolean, default: false },
   bank: { accountName: S, bankName: S, accountNumber: S, ifsc: S, branch: S }, paymentInstructions: S,
   requireAadhaar: { type: Boolean, default: true }, // collect Aadhaar at member registration
   statsMembersOverride: { type: Number, min: 0, default: 0 }, statsInstitutesOverride: { type: Number, min: 0, default: 0 }, // landing-page numbers, 0 = use real counts
   discountStacking: { type: Boolean, default: false }, discountCap: { type: Number, default: 50 },
-  site: { about: S, contactEmail: S, contactPhone: S, address: S, tagline: S, social: { youtube: S, facebook: S, instagram: S, telegram: S, linkedin: S } },
+  site: { about: S, contactEmail: S, contactPhone: S, whatsapp: S, whatsappMessage: S, workingHours: S, address: S, tagline: S, social: { youtube: S, facebook: S, instagram: S, telegram: S, linkedin: S } },
 }, T));

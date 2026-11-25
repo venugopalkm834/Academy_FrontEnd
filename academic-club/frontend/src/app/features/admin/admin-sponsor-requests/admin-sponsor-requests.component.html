@@ -1,4 +1,4 @@
-<h1 class="page-title">Sponsor Requests</h1>
+<h1 class="page-title">Ad Requests (banners and sponsors)</h1>
 <p class="muted small">Partners who asked to be featured on the main page. Approving publishes the ad right away for the configured number of days.</p>
 <div class="chips">@for (f of filters; track f[0]) { <button class="chip" [class.on]="filter() === f[0]" (click)="filter.set(f[0])">{{ f[1] }}</button> }</div>
 @if (error()) { <div class="note err">{{ error() }}</div> }
@@ -9,6 +9,7 @@
       <div class="oh"><h3>{{ r.institution?.name }}</h3>
         <span class="badge" [class.ok]="r.status === 'ACTIVE'" [class.warn]="r.status === 'PAYMENT_REVIEW' || r.status === 'PENDING_APPROVAL' || r.status === 'PENDING_PAYMENT'" [class.bad]="r.status === 'REJECTED' || r.status === 'CANCELLED'">{{ label(r.status) }}</span></div>
       @if (r.imageUrl) { <img class="prev banner" [src]="r.imageUrl" alt=""> }
+      <p class="small"><span class="badge">{{ r.kind === 'BANNER' ? '🖼 Banner ad' : '⭐ Featured sponsor' }}</span>@if (r.linkUrl) { <span class="muted"> 🔗 {{ r.linkUrl }}</span> }</p>
       <p class="headline">{{ r.headline }}</p>
       @if (r.adText) { <p class="small">{{ r.adText }}</p> }
       <p class="muted small">{{ r.durationDays }} days · {{ r.amount > 0 ? (r.amount | currency:'INR':'symbol':'1.0-0') : 'free' }} · {{ r.createdAt | date:'mediumDate' }}@if (r.payment) { <br>🔖 Txn {{ r.payment.txn }} ({{ r.payment.status }}) }</p>

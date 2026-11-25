@@ -17,13 +17,15 @@
   </div>
 
   <h3>2. Partner fees (institutions that list themselves)</h3>
-  <small class="muted">Plan A = normal listing of their details and offerings. Plan B = featured sponsor on the main page. Set a fee to 0 to make a plan free.</small>
+  <small class="muted">Plan A = normal listing of their details and offerings. Plan B = ads on the main page (featured sponsor card or image banner, with payment screenshot). Set a fee to 0 to make a plan free.</small>
   <div class="grid">
     <label>Free listing days after partner registers<input type="number" min="0" formControlName="partnerFreeDays"></label>
     <label>Plan A: listing fee (₹)<input type="number" min="0" formControlName="partnerListingFee"></label>
     <label>Plan A: listing valid for (days)<input type="number" min="1" formControlName="listingValidityDays"></label>
     <label>Plan B: sponsorship fee (₹)<input type="number" min="0" formControlName="partnerSponsorFee"></label>
-    <label>Plan B: ad runs for (days)<input type="number" min="1" formControlName="sponsorDurationDays"></label>
+    <label>Plan B: sponsor card runs for (days)<input type="number" min="1" formControlName="sponsorDurationDays"></label>
+    <label>Plan B: image banner ad fee (₹)<input type="number" min="0" formControlName="partnerBannerFee"></label>
+    <label>Plan B: banner ad runs for (days)<input type="number" min="1" formControlName="bannerDurationDays"></label>
   </div>
 
   <h3>3. Landing page numbers and registration</h3>

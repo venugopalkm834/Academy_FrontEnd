@@ -6,7 +6,7 @@
     @if (!isPartner()) { <a routerLink="/partners" class="btn-yellow">Explore Offers →</a> }
     @if (!auth.user()) {
         <a routerLink="/member/register" class="btn-outline">Join The Academic Club</a>
-        <a routerLink="/partner/register" class="btn-outline">Register Your Institution</a>
+        <a routerLink="/partner/register" class="btn-outline">Register Your Academy</a>
       }
   </div>
   <div class="ribbon"><small>UP TO</small><strong>50%</strong><span>DISCOUNT</span></div>
@@ -29,18 +29,7 @@
     </article> }</div></section>
 }
 
-@if (!isPartner()) {
-<section class="wrap"><div class="featured">
-  <div class="ft-title">Featured Partner Institute</div>
-  <div class="ft-logo"><span>🎓</span><b>EduNext</b><em>Institute</em><small>Learn Today… Lead Tomorrow</small></div>
-  <div class="ft-mid"><h3>Spoken English &amp; Communication Skills</h3>
-    <p class="ticks">✔ Personality Development &nbsp;✔ Interview Preparation &nbsp;✔ Public Speaking</p>
-    <div class="price"><div class="orig">Original Price<s>₹10,000</s></div><span class="arrow">→</span>
-      <div class="club">Club Price<strong>₹5,000</strong><b>Upto 50% OFF</b></div></div></div>
-  <div class="ft-why"><h4>Why Choose This Offer?</h4><ul><li>Expert Trainers</li><li>Flexible Batches</li><li>Certificate Provided</li><li>Career Guidance</li></ul>
-    <a routerLink="/partners" class="btn-blue block">Claim Discount Now →</a></div>
-</div></section>
-}
+@if (!isPartner()) { <ac-entertainment-slider /> }
 
 <section class="benefits"><div class="wrap row">
   <div class="b-list">@for (b of benefits; track b.t) { <div class="b"><span>{{ b.i }}</span>{{ b.t }}</div> }</div>

@@ -24,26 +24,31 @@
     </section>
 
     <section class="item plan">
-      <div class="oh"><h3>Plan B: Featured sponsor</h3><span class="badge warn">⭐ Main page</span></div>
-      <p class="muted small">Ask to be shown as a sponsor on the main page and at the top of the user panel. Runs for {{ x.sponsorDurationDays }} days after the admin approves.</p>
-      <p>Sponsorship fee: <b>{{ x.sponsorFee > 0 ? (x.sponsorFee | currency:'INR':'symbol':'1.0-0') : 'Free (admin approval only)' }}</b></p>
+      <div class="oh"><h3>Plan B: Advertise on the main page</h3><span class="badge warn">📣 Ads</span></div>
+      <p class="muted small">Send a request for an ad. Choose an <b>image banner</b> that slides on the home page and member panel, or a <b>featured sponsor card</b>. Pay the fee, upload the payment screenshot, and the ad goes live after the admin approves.</p>
+      <p>Banner ad: <b>{{ x.bannerFee > 0 ? (x.bannerFee | currency:'INR':'symbol':'1.0-0') : 'Free (admin approval only)' }}</b> for {{ x.bannerDurationDays }} days<br>Sponsor card: <b>{{ x.sponsorFee > 0 ? (x.sponsorFee | currency:'INR':'symbol':'1.0-0') : 'Free (admin approval only)' }}</b> for {{ x.sponsorDurationDays }} days</p>
       @if (x.approval === 'APPROVED') {
         <form class="form" [formGroup]="form" (ngSubmit)="request()">
-          <label>Ad headline *<input formControlName="headline" placeholder="e.g. Up to 40% off yoga classes"></label>
+          <label>What do you want?<select formControlName="kind"><option value="BANNER">🖼 Image banner ad</option><option value="SPONSOR">⭐ Featured sponsor card</option></select></label>
+          <label>Ad title / headline *<input formControlName="headline" placeholder="e.g. Up to 40% off yoga classes"></label>
           <label>Ad text<textarea rows="2" formControlName="adText"></textarea></label>
-          <label>Banner image (optional)<input type="file" accept="image/png,image/jpeg,image/webp" (change)="pickImage($event)">@if (form.value.imageUrl) { <img class="prev" [src]="form.value.imageUrl" alt=""> }</label>
-          <button class="btn-blue" [disabled]="busy()">{{ busy() ? 'Sending…' : 'Request sponsorship' }}</button>
+          <label>{{ form.value.kind === 'BANNER' ? 'Banner image * (1600 × 500 px works best)' : 'Image (optional)' }}<input type="file" accept="image/png,image/jpeg,image/webp" (change)="pickImage($event)">@if (form.value.imageUrl) { <img class="prev" [src]="form.value.imageUrl" alt=""> }</label>
+          @if (form.value.kind === 'BANNER') {
+            <label>Phone image (optional, 800 × 600 px)<input type="file" accept="image/png,image/jpeg,image/webp" (change)="pickImage($event, 'mobileImageUrl')">@if (form.value.mobileImageUrl) { <img class="prev" [src]="form.value.mobileImageUrl" alt=""> }</label>
+            <label>Where should a click go? (optional)<input formControlName="linkUrl" placeholder="https://your-website.com">@if (form.controls.linkUrl.invalid) { <small class="err">Must start with https:// or /</small> }</label>
+          }
+          <button class="btn-blue" [disabled]="busy()">{{ busy() ? 'Sending…' : 'Send ad request' }}</button>
         </form>
       }
     </section>
   </div>
 
   @if (x.requests.length) {
-    <h2 class="sub">My sponsorship requests</h2>
+    <h2 class="sub">My ad requests</h2>
     <div class="list">
       @for (r of x.requests; track r._id) {
         <article class="item" [class.wide]="payingId() === r._id">
-          <div class="oh"><h3>{{ r.headline }}</h3>
+          <div class="oh"><h3>{{ r.kind === 'BANNER' ? '🖼' : '⭐' }} {{ r.headline }}</h3>
             <span class="badge" [class.ok]="r.status === 'ACTIVE'" [class.warn]="r.status === 'PAYMENT_REVIEW' || r.status === 'PENDING_APPROVAL' || r.status === 'PENDING_PAYMENT'" [class.bad]="r.status === 'REJECTED' || r.status === 'CANCELLED'">{{ label(r.status) }}</span></div>
           <p class="muted small">{{ r.durationDays }} days · {{ r.amount > 0 ? (r.amount | currency:'INR':'symbol':'1.0-0') : 'free' }} · {{ r.createdAt | date:'mediumDate' }}</p>
           @if (r.note) { <p class="note err">{{ r.note }}</p> }

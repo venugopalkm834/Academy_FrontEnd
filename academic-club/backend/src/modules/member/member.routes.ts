@@ -5,6 +5,7 @@ import { Membership, Payment, Booking, Course, Institution } from '../../models'
 import { authenticate, requireRole, validate, wrap, HttpError } from '../../middleware';
 import { getSettings } from '../../services/settings';
 import { computeAccess } from '../../services/access';
+import { onBookingCreated, onBookingConfirmed, onPaymentSubmitted } from '../../services/events';
 
 const r = Router(); r.use(authenticate, requireRole('MEMBER'));
 const state = async (uid: string) => {
@@ -33,6 +34,7 @@ r.post('/bookings', validate(z.object({ courseId: z.string(), note: z.string().m
   const fee = access.bookingPaymentRequired ? s.bookingFee || 0 : 0;
   const b = await Booking.create({ bookingNo: bookingNo(), member: uid, course: course._id, institution: inst._id, note: req.body.note, amount: fee,
     snapshot: { courseName: course.name, originalFee: course.originalFee, finalFee: course.finalFee }, status: fee > 0 ? 'PENDING_PAYMENT' : 'CONFIRMED' });
+  await onBookingCreated(b); if (b.status === 'CONFIRMED') await onBookingConfirmed(b);
   res.status(201).json(b);
 }));
 r.get('/bookings', wrap(async (req, res) => {
@@ -44,8 +46,8 @@ const mine = async (req: any) => { const b = await Booking.findOne({ _id: req.pa
 r.post('/bookings/:id/pay', validate(payBody), wrap(async (req, res) => {
   const b = await mine(req);
   if (b.status !== 'PENDING_PAYMENT') throw new HttpError(400, 'This booking does not need a payment.');
-  await Payment.create({ user: req.user!.id, purpose: 'BOOKING', booking: b._id, amount: b.amount, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
-  b.status = 'PAYMENT_REVIEW'; b.paymentNote = undefined; await b.save(); res.status(201).json(b);
+  const bp = await Payment.create({ user: req.user!.id, purpose: 'BOOKING', booking: b._id, amount: b.amount, transactionId: req.body.transactionId, proofKey: req.body.proofKey });
+  await onPaymentSubmitted(bp); b.status = 'PAYMENT_REVIEW'; b.paymentNote = undefined; await b.save(); res.status(201).json(b);
 }));
 r.post('/bookings/:id/cancel', wrap(async (req, res) => {
   const b = await mine(req);

@@ -1,0 +1,13 @@
+<div class="bell">
+  <button type="button" class="b" (click)="toggle()" aria-label="Notifications">🔔@if (unread() > 0) { <span class="count">{{ unread() > 9 ? '9+' : unread() }}</span> }</button>
+  @if (open()) {
+    <div class="scrim" (click)="close()"></div>
+    <div class="panel" role="dialog" aria-label="Notifications">
+      <div class="head"><b>Notifications</b><button type="button" class="x" (click)="close()" aria-label="Close">✕</button></div>
+      @if (!items().length) { <p class="none">No notifications yet.</p> }
+      @for (n of items(); track n._id) {
+        <div class="n" [class.new]="!n.read"><b>{{ n.title }}</b><span>{{ n.body }}</span><small>{{ n.createdAt | date:'d MMM, h:mm a' }}</small></div>
+      }
+    </div>
+  }
+</div>

@@ -2,9 +2,11 @@ import { Router } from 'express';
 import path from 'path';
 import { isValidObjectId } from 'mongoose';
 import { z } from 'zod';
-import { User, Partner, Institution, Course, Sponsor, Notification, Banner, AdminSettings, Payment, Membership, Booking, SponsorRequest } from '../../models';
+import { User, Partner, Institution, Course, Sponsor, Notification, Banner, EntertainmentBooking, AdminSettings, Payment, Membership, Booking, SponsorRequest } from '../../models';
 import { getSettings } from '../../services/settings';
 import { activateMembership } from '../../services/membership';
+import { onPaymentApproved, onPaymentRejected, onBookingConfirmed, onEntertainmentConfirmed } from '../../services/events';
+import { resendConfigured } from '../../services/mail';
 import { authenticate, requireRole, validate, wrap, HttpError } from '../../middleware';
 import { applyPrice } from '../../services/course-pricing';
 import { sendMail } from '../../services/mail';
@@ -16,6 +18,11 @@ const oid = (id: string) => { if (!isValidObjectId(id)) throw new HttpError(400,
 async function decideSponsorRequest(sr: any, approve: boolean, reason: string) {
   if (approve) {
     const now = new Date(), end = new Date(now.getTime() + (sr.durationDays || 30) * 864e5);
+    if (sr.kind === 'BANNER') {
+      const bn: any = await Banner.create({ title: sr.headline, imageUrl: sr.imageUrl, mobileImageUrl: sr.mobileImageUrl, linkUrl: sr.linkUrl, placement: 'ALL', startsAt: now, expiresAt: end, active: true });
+      sr.status = 'ACTIVE'; sr.banner = bn._id; sr.note = undefined; await sr.save();
+      return `Your banner ad is approved and live until ${end.toDateString()}.`;
+    }
     const sp: any = await Sponsor.create({ institution: sr.institution, headline: sr.headline, adText: sr.adText, imageUrl: sr.imageUrl, startsAt: now, expiresAt: end, active: true });
     sr.status = 'ACTIVE'; sr.sponsor = sp._id; sr.note = undefined; await sr.save();
     return `Your sponsorship is approved and live on the main page until ${end.toDateString()}.`;
@@ -99,7 +106,7 @@ const settingsSchema = z.object({
   paymentRequiredAt: z.enum(['NONE', 'REGISTRATION', 'BOOKING']), freeTrialDays: z.coerce.number().int().min(0).max(3650),
   membershipFee: z.coerce.number().min(0), membershipValidityDays: z.coerce.number().int().min(1).max(3650), bookingFee: z.coerce.number().min(0),
   partnerFreeDays: z.coerce.number().int().min(0).max(3650), partnerListingFee: z.coerce.number().min(0), listingValidityDays: z.coerce.number().int().min(1).max(3650),
-  partnerSponsorFee: z.coerce.number().min(0), sponsorDurationDays: z.coerce.number().int().min(1).max(3650),
+  partnerBannerFee: z.coerce.number().min(0), bannerDurationDays: z.coerce.number().int().min(1).max(3650), partnerSponsorFee: z.coerce.number().min(0), sponsorDurationDays: z.coerce.number().int().min(1).max(3650),
   requireAadhaar: z.boolean().optional(), statsMembersOverride: z.coerce.number().int().min(0).optional(), statsInstitutesOverride: z.coerce.number().int().min(0).optional(),
   upiId: txt, upiQrUrl: z.string().max(300).optional(), showQr: z.boolean(), showBank: z.boolean(), paymentInstructions: z.string().max(1000).optional(),
   bank: z.object({ accountName: txt, bankName: txt, accountNumber: txt, ifsc: txt, branch: txt }).optional(),
@@ -107,7 +114,7 @@ const settingsSchema = z.object({
 r.get('/settings', wrap(async (_req, res) => { res.json(await getSettings()); }));
 r.put('/settings', validate(settingsSchema), wrap(async (req, res) => {
   const b = req.body;
-  const anyFee = b.paymentRequiredAt !== 'NONE' || b.partnerListingFee > 0 || b.partnerSponsorFee > 0;
+  const anyFee = b.paymentRequiredAt !== 'NONE' || b.partnerListingFee > 0 || b.partnerSponsorFee > 0 || b.partnerBannerFee > 0;
   if (anyFee) {
     const hasDetails = !!b.upiId || (b.showQr && !!b.upiQrUrl) || (b.showBank && !!b.bank?.accountNumber);
     if (!hasDetails) throw new HttpError(400, 'Add payment details first (UPI ID, QR code or bank account) so members know where to pay.');
@@ -140,13 +147,19 @@ r.put('/payments/:id/review', validate(z.object({ action: z.enum(['approve', 're
     }
   } else if (p.purpose === 'SPONSORSHIP') {
     const sr: any = await SponsorRequest.findById(p.sponsorRequest); if (sr) msg = await decideSponsorRequest(sr, approve, reason);
+  } else if (p.purpose === 'ENTERTAINMENT') {
+    const eb: any = await EntertainmentBooking.findById(p.entertainmentBooking);
+    if (eb) { eb.status = approve ? 'CONFIRMED' : 'PENDING_PAYMENT'; eb.paymentNote = approve ? undefined : reason; await eb.save();
+      msg = approve ? `Your booking ${eb.bookingNo} for ${eb.snapshot?.title} is confirmed.` : `Payment for booking ${eb.bookingNo} was rejected: ${reason}. Please pay again.`; }
   } else {
     const b = await Booking.findById(p.booking);
     if (b) { b.status = approve ? 'CONFIRMED' : 'PENDING_PAYMENT'; b.paymentNote = approve ? undefined : reason; await b.save();
       msg = approve ? `Your booking ${b.bookingNo} is confirmed.` : `Payment for booking ${b.bookingNo} was rejected: ${reason}. Please pay again.`; }
   }
-  const u: any = await User.findById(p.user).select('email'); await notify(p.user, 'Payment update', msg);
-  if (u) sendMail(u.email, 'The Academic Club: payment update', `<p>${msg}</p>`).catch(() => {});
+  await notify(p.user, 'Payment update', msg);
+  if (approve) { await onPaymentApproved(p); if (p.purpose === 'BOOKING') { const b = await Booking.findById(p.booking); if (b) await onBookingConfirmed(b); }
+    if (p.purpose === 'ENTERTAINMENT') { const eb = await EntertainmentBooking.findById(p.entertainmentBooking); if (eb) await onEntertainmentConfirmed(eb); } }
+  else await onPaymentRejected(p, reason);
   res.json(p);
 }));
 
@@ -175,4 +188,16 @@ r.get('/banners', wrap(async (_req, res) => { res.json({ items: await Banner.fin
 r.post('/banners', validate(bannerSchema), wrap(async (req, res) => { res.status(201).json(await Banner.create(req.body)); }));
 r.put('/banners/:id', validate(bannerSchema.partial()), wrap(async (req, res) => { const b = await Banner.findByIdAndUpdate(oid(req.params.id), req.body, { new: true }); if (!b) throw new HttpError(404, 'Banner not found'); res.json(b); }));
 r.delete('/banners/:id', wrap(async (req, res) => { await Banner.findByIdAndDelete(oid(req.params.id)); res.json({ message: 'Deleted' }); }));
+
+// ---- Contact details + email sender (shown in the site, member and academy panels)
+const optMail = z.string().email().or(z.literal('')).optional();
+const siteSchema = z.object({ contactEmail: optMail, whatsapp: z.string().regex(/^[+\d\s-]{0,16}$/, 'WhatsApp number: digits only, with country code if outside India').optional(), contactPhone: z.string().max(20).optional(),
+  address: z.string().max(400).optional(), workingHours: z.string().max(120).optional(), whatsappMessage: z.string().max(200).optional(), emailFrom: z.string().max(160).optional(), notifyEmail: optMail });
+r.get('/site', wrap(async (_req, res) => { const s = await getSettings(); res.json({ ...(s.site || {}), emailFrom: s.emailFrom || '', notifyEmail: s.notifyEmail || '', resendConfigured: resendConfigured() }); }));
+r.put('/site', validate(siteSchema), wrap(async (req, res) => {
+  const { emailFrom, notifyEmail, ...site } = req.body; const set: any = {};
+  for (const [k, v] of Object.entries(site)) set[`site.${k}`] = v;
+  if (emailFrom !== undefined) set.emailFrom = emailFrom; if (notifyEmail !== undefined) set.notifyEmail = notifyEmail;
+  await AdminSettings.findOneAndUpdate({ key: 'global' }, { $set: set }, { upsert: true }); res.json({ message: 'Saved' });
+}));
 export default r;

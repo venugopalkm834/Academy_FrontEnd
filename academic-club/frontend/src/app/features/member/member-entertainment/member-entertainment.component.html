@@ -1,0 +1,42 @@
+<h1 class="page-title">Club Entertainment</h1>
+@if (error()) { <div class="note err">{{ error() }}</div> } @if (msg()) { <div class="note ok">{{ msg() }}</div> }
+@if (!loading() && !events().length) { <p class="empty">No events are open for booking right now. Please check back soon.</p> }
+<div class="list">
+  @for (e of events(); track e.id) {
+    <article class="item ev" [id]="'ev-' + e.id" [class.hl]="highlight() === e.id">
+      <div class="pic" [style.background-image]="e.imageUrl ? 'url(' + e.imageUrl + ')' : null">@if (!e.imageUrl) { <span>🎭</span> }</div>
+      <h3>{{ e.title }}</h3>
+      @if (e.subtitle) { <p class="headline">{{ e.subtitle }}</p> }
+      <p class="small muted">@if (e.eventDate) { 📅 {{ e.eventDate | date:'EEE, d MMM y' }} {{ e.eventTime }} } @if (e.venue) { <br>📍 {{ e.venue }} }</p>
+      @if (e.description) { <p class="small">{{ e.description }}</p> }
+      <div class="oh"><b class="pr">{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}</b>
+        @if (e.seatsLeft !== null) { <span class="badge" [class.ok]="e.seatsLeft > 5" [class.bad]="e.seatsLeft <= 5">{{ e.seatsLeft > 0 ? e.seatsLeft + ' seats left' : 'Sold out' }}</span> }</div>
+      @if (e.seatsLeft !== 0) {
+        <div class="buy">
+          <label>Tickets<input type="number" min="1" [max]="e.maxPerBooking" [value]="q(e.id)" (input)="setQty(e.id, $any($event.target).value, e.maxPerBooking)"></label>
+          <div class="total">Total <b>{{ e.price * q(e.id) | currency:'INR':'symbol':'1.0-0' }}</b></div>
+          <button class="btn-sm green" [disabled]="busy() === e.id" (click)="book(e)">{{ busy() === e.id ? 'Booking…' : 'Book now' }}</button>
+        </div>
+      }
+    </article>
+  }
+</div>
+
+<h2 class="sub" #mine>My Club Entertainment bookings</h2>
+@if (!bookings().length) { <p class="empty">You have no bookings yet.</p> }
+<div class="list">
+  @for (b of bookings(); track b._id) {
+    <article class="item" [class.wide]="payingId() === b._id">
+      <div class="oh"><h3>{{ b.snapshot?.title }}</h3><span class="badge" [class.ok]="b.status === 'CONFIRMED'" [class.warn]="b.status === 'PENDING_PAYMENT' || b.status === 'PAYMENT_REVIEW'" [class.bad]="b.status === 'CANCELLED'">{{ label(b.status) }}</span></div>
+      <p class="small muted">{{ b.bookingNo }} · {{ b.qty }} ticket(s) · {{ b.amount | currency:'INR':'symbol':'1.0-0' }}<br>@if (b.snapshot?.eventDate) { 📅 {{ b.snapshot.eventDate | date:'EEE, d MMM y' }} {{ b.snapshot.eventTime }} } @if (b.snapshot?.venue) { · 📍 {{ b.snapshot.venue }} }</p>
+      @if (b.status === 'CONFIRMED') { <p class="note ok">✔ Confirmed. Show booking number <b>{{ b.bookingNo }}</b> at the entry.</p> }
+      @if (b.status === 'PAYMENT_REVIEW') { <p class="note warn">⏳ Payment submitted. Waiting for admin approval.</p> }
+      @if (b.status === 'PENDING_PAYMENT') {
+        @if (b.paymentNote) { <p class="note err">Payment rejected: {{ b.paymentNote }}</p> }
+        <p class="note warn">Pay {{ b.amount | currency:'INR':'symbol':'1.0-0' }} and upload the screenshot to confirm.</p>
+        <div class="actions"><button class="btn-sm green" (click)="toggle(b._id)">{{ payingId() === b._id ? 'Hide' : 'Pay now' }}</button><button class="btn-sm red" (click)="cancel(b)">Cancel</button></div>
+        @if (payingId() === b._id) { <ac-payment-form [payUrl]="'/member/entertainment/bookings/' + b._id + '/pay'" [amount]="b.amount" (paid)="paid()" /> }
+      }
+    </article>
+  }
+</div>

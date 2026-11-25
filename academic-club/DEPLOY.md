@@ -36,7 +36,7 @@ git push -u origin main
 4. Firewall: `sudo ufw allow OpenSSH && sudo ufw allow 80 && sudo ufw allow 443 && sudo ufw enable`
 5. Get the code: `sudo mkdir -p /opt && cd /opt && sudo git clone https://github.com/YOUR-NAME/academic-club.git && cd academic-club`
 6. Settings: `cp .env.production.example .env && nano .env` and fill **every** value (secrets: `openssl rand -hex 32`). **Back up `AADHAAR_KEY` somewhere safe.**
-7. Start: `docker compose up -d --build` (first build takes a few minutes). Watch: `docker compose logs -f backend`. You should see `Academic Club API v0.9.0 running`.
+7. Start: `docker compose up -d --build` (first build takes a few minutes). Watch: `docker compose logs -f backend`. You should see `Academic Club API v0.11.0 running`.
 8. Open https://theacademicclub.com. HTTPS certificates are issued automatically on the first visit.
 
 ## 3. First things to do after going live
@@ -45,7 +45,7 @@ git push -u origin main
 3. Admin > **Payment Settings**: UPI ID / QR / bank details, partner fees, landing counters, Aadhaar on/off.
 4. Admin > **Banners**: upload your first ad banners.
 5. **Razorpay**: put the live keys in `.env`, then in the Razorpay dashboard add the webhook `https://theacademicclub.com/api/webhooks/razorpay` (events `payment.captured`, `order.paid`, `payment.failed`, `refund.processed`) with the same secret as `RAZORPAY_WEBHOOK_SECRET`. Run `docker compose up -d` to apply `.env` changes.
-6. **Email**: fill the SMTP values (otherwise verification / reset emails are only written to the log).
+6. **Email (Resend)**: create an account at resend.com, verify your domain, create an API key and put it in `.env` as `RESEND_API_KEY`. Then in Admin > Contact & Email Settings set the sender (for example `info@academicclub.com`, it must belong to the verified domain) and the admin alert email, and use "Send test" in Email Templates. SMTP values still work as a fallback.
 7. Test a registration and a small real payment end to end.
 
 ## 4. Update the live site later

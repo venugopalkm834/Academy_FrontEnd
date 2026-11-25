@@ -1,0 +1,23 @@
+<h1 class="page-title">Contact &amp; Email Settings</h1>
+<form class="card form" [formGroup]="form" (ngSubmit)="save()">
+  <h3>Contact details shown to members and academies</h3>
+  <small class="muted">These appear on the Contact page, in the footer, in the Help &amp; Contact page of every panel and behind the floating WhatsApp button.</small>
+  <div class="grid">
+    <label>Contact email<input type="email" formControlName="contactEmail" placeholder="info@academicclub.com">@if (form.controls.contactEmail.invalid) { <small class="err">Enter a valid email</small> }</label>
+    <label>WhatsApp number<input type="tel" formControlName="whatsapp" placeholder="9876543210 or +91 98765 43210">@if (form.controls.whatsapp.invalid) { <small class="err">Digits only (add the country code if outside India)</small> }</label>
+    <label>Phone (optional)<input type="tel" formControlName="contactPhone"></label>
+    <label>Working hours (optional)<input formControlName="workingHours" placeholder="Mon-Sat, 9 am - 6 pm"></label>
+    <label class="full">Address<textarea rows="3" formControlName="address" placeholder="Office address"></textarea></label>
+    <label class="full">First WhatsApp message (pre-filled when someone taps the WhatsApp button)<input formControlName="whatsappMessage" placeholder="Hello, I need help with The Academic Club."></label>
+  </div>
+
+  <h3>Emails sent by the site</h3>
+  <small class="muted">Status: @if (resend()) { <b class="ok">Resend is connected ✔</b> } @else { <b class="bad">Resend is not connected. Add RESEND_API_KEY to the server settings (.env), otherwise emails are only printed in the log.</b> } The sender domain must be verified in your Resend account.</small>
+  <div class="grid">
+    <label>Send emails from<input formControlName="emailFrom" placeholder="info@academicclub.com"></label>
+    <label>Send admin alerts to (new member, booking, payment…)<input type="email" formControlName="notifyEmail" placeholder="info@academicclub.com">@if (form.controls.notifyEmail.invalid) { <small class="err">Enter a valid email</small> }</label>
+  </div>
+  <small class="muted">The wording of each automatic email is edited under <b>Email Templates</b>.</small>
+  @if (msg()) { <div class="note ok">{{ msg() }}</div> } @if (err()) { <div class="note err">{{ err() }}</div> }
+  <button class="btn-blue" [disabled]="busy()">{{ busy() ? 'Saving…' : 'Save' }}</button>
+</form>

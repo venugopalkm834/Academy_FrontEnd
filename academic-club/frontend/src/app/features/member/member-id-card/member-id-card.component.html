@@ -28,6 +28,8 @@
   <div class="actions no-print no-print-gap">
     <button class="btn-sm green" (click)="pdf()" [disabled]="busy()">{{ busy() ? 'Preparing…' : '⬇ Download PDF' }}</button>
     <button class="btn-sm ghost" (click)="print()">🖨 Print</button>
+    <a class="btn-sm wa" [href]="waLink()" target="_blank" rel="noopener">💬 Share on WhatsApp</a>
+    @if (canShareFile()) { <button class="btn-sm ghost" (click)="sharePdf()" [disabled]="busy()">📤 Share PDF</button> }
     @if (c.status !== 'ACTIVE') { <a class="btn-sm yellow" routerLink="../membership">Renew membership</a> }
   </div>
 }

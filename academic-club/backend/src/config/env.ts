@@ -8,5 +8,5 @@ export const env = {
   mongo: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/academic_club', client: process.env.CLIENT_URL || 'http://localhost:4200',
   access: need('JWT_ACCESS_SECRET'), refresh: need('JWT_REFRESH_SECRET'),
   smtp: { host: process.env.SMTP_HOST, port: +(process.env.SMTP_PORT || 587), user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  from: process.env.MAIL_FROM || 'no-reply@localhost',
+  from: process.env.MAIL_FROM || 'The Academic Club <info@academicclub.com>',
 };

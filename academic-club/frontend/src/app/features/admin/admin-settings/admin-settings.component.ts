@@ -10,7 +10,7 @@ export class AdminSettingsComponent implements OnInit {
   msg = signal(''); err = signal(''); busy = signal(false);
   form = this.fb.nonNullable.group({
     paymentRequiredAt: ['NONE'], freeTrialDays: [7, [Validators.required, Validators.min(0)]],
-    partnerFreeDays: [30, Validators.min(0)], partnerListingFee: [0, Validators.min(0)], listingValidityDays: [365, Validators.min(1)], partnerSponsorFee: [0, Validators.min(0)], sponsorDurationDays: [30, Validators.min(1)],
+    partnerFreeDays: [30, Validators.min(0)], partnerListingFee: [0, Validators.min(0)], listingValidityDays: [365, Validators.min(1)], partnerSponsorFee: [0, Validators.min(0)], partnerBannerFee: [0, Validators.min(0)], bannerDurationDays: [30, Validators.min(1)], sponsorDurationDays: [30, Validators.min(1)],
     membershipFee: [0, Validators.min(0)], membershipValidityDays: [365, [Validators.required, Validators.min(1)]], bookingFee: [0, Validators.min(0)],
     requireAadhaar: [true], statsMembersOverride: [0, Validators.min(0)], statsInstitutesOverride: [0, Validators.min(0)],
     upiId: [''], upiQrUrl: [''], showQr: [true], showBank: [false], paymentInstructions: [''],

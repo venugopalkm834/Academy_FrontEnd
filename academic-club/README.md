@@ -35,6 +35,21 @@ Or two terminals: `cd backend && npm install && npm run dev` / `cd frontend && n
 - The public home page also shows the sponsors the admin picked; the public Sponsors page is at /partners.
 - Mobile-friendly: responsive grids, slide-in sidebar, swipeable ad strip and category chips.
 
+## What is new in v0.11
+- **Club Entertainment** replaces the old "Featured Partner Institute" section at the bottom of the home page. In **Admin > Club Entertainment** the admin adds any number of shows / events (image, title, date, time, venue, ticket price, seats, show-from / show-until dates, order) and can edit, hide or remove them. Every live item **slides** on the home page (auto-slide, arrows, swipe on phones).
+- **Booking**: the member taps **Book now** (log in first; after login they come back to the same event), picks the number of tickets, pays by UPI / bank and uploads the payment screenshot. The admin approves under **Club Entertainment > Bookings** (or in Payments). Then the booking is confirmed, the member gets a notification and an email (wording editable in Email Templates). Seats are held while a booking is pending, so events cannot be overbooked. Free events (price 0) confirm immediately. The admin is notified of every booking.
+- **ID card on WhatsApp**: My ID Card has **Share on WhatsApp** (a message with the member ID and the verification link) and, on phones that support it, **Share PDF** to send the PDF itself.
+
+## What was new in v0.10
+- **WhatsApp button**: a green floating icon on every page (site, member, academy and admin panels). Tapping it opens WhatsApp with the admin's number and a pre-filled message.
+- **Contact details from the admin panel** (Admin > Contact & Email Settings): email, WhatsApp number, phone, address, working hours. They show on the Contact page, footer and in "Help & Contact" inside the member and academy panels.
+- **Academy login**: the partner login is now called "Academy Login" (the address /partner/login still works, and /academy/login too).
+- **Ad requests by academies** (Academy > Plans, Ads & Payments): an academy sends a request for an **image banner** or a **featured sponsor card**, pays the admin-set fee and uploads the payment screenshot. The admin approves in **Ad Requests** and the ad goes live (banner on the home slider and member panel). Fees and days are set in Payment Settings.
+- **Notifications (bell icon)** in every panel. The admin is notified (bell + email) of every new member, new academy, new booking and every payment waiting for verification. Members and academies are notified of confirmed bookings and payment decisions.
+- **Emails through Resend**: after a payment is approved or rejected (to the member or academy) and when a booking is confirmed (to the member **and** the academy). Set `RESEND_API_KEY` in `.env` and verify your sending domain in Resend. The sender (e.g. info@academicclub.com) and the admin alert address are set in Contact & Email Settings. Without a key emails are printed in the backend log.
+- **Email Templates** (Admin > Email Templates): edit the subject and wording of each automatic email, switch them on or off, reset to default, and send yourself a test.
+- **Mobile**: bottom menu bar in every panel, bigger touch targets, no iPhone zoom on fields, forms centred on every screen size.
+
 ## Membership, ID card and online payment (v0.8)
 - **Register** (/member/register): full name, Student/Parent, mobile, email, DOB, gender, address, state/district/city/PIN, education level, Aadhaar, selfie (camera capture on phones or upload, with preview), password. Registration and payment are separate steps.
 - **Plans** (Admin > Membership Plans): any number of one-year or lifetime plans with any price, optionally only for **LKG to SSLC** or **PUC to Degree** members. The member's education level decides which plans they see, automatically.

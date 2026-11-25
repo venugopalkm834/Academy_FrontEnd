@@ -1,0 +1,58 @@
+<h1 class="page-title">Club Entertainment</h1>
+<p class="muted small">Add any number of shows or events. They slide on the home page (instead of the old Featured Partner section) and in the member panel. Members book, pay and upload the payment screenshot; you approve the booking here or in Payments.</p>
+<div class="chips"><button class="chip" [class.on]="tab() === 'list'" (click)="tab.set('list')">🎭 Listings</button><button class="chip" [class.on]="tab() === 'bookings'" (click)="tab.set('bookings'); loadBookings()">🎟 Bookings</button></div>
+@if (msg()) { <div class="note ok">{{ msg() }}</div> } @if (err()) { <div class="note err">{{ err() }}</div> }
+
+@if (tab() === 'list') {
+  <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+    <h3>{{ editing() ? 'Edit entertainment' : 'Add entertainment' }}</h3>
+    <div class="grid">
+      <label class="full">Title *<input formControlName="title" placeholder="e.g. Stand-up Comedy Night">@if (form.controls.title.invalid && form.controls.title.touched) { <small class="err">Enter a title</small> }</label>
+      <label class="full">Short line<input formControlName="subtitle" placeholder="e.g. Members get 20% off"></label>
+      <label class="full">Description<textarea rows="3" formControlName="description"></textarea></label>
+      <label class="full">Image (16:9 works best)<input type="file" accept="image/png,image/jpeg,image/webp" (change)="pick($event)">@if (form.value.imageUrl) { <img class="pre" [src]="form.value.imageUrl" alt="Preview"> }@if (uploading()) { <small class="muted">Uploading…</small> }</label>
+      <label>Event date<input type="date" formControlName="eventDate"></label>
+      <label>Time<input formControlName="eventTime" placeholder="7:00 PM"></label>
+      <label class="full">Venue<input formControlName="venue"></label>
+      <label>Price per ticket (₹, 0 = free)<input type="number" min="0" formControlName="price"></label>
+      <label>Total seats (0 = unlimited)<input type="number" min="0" formControlName="capacity"></label>
+      <label>Max tickets per booking<input type="number" min="1" formControlName="maxPerBooking"></label>
+      <label>Display order (low = first)<input type="number" formControlName="order"></label>
+      <label>Show from<input type="date" formControlName="startsAt"></label>
+      <label>Show until<input type="date" formControlName="expiresAt"></label>
+    </div>
+    <label class="chk"><input type="checkbox" formControlName="active"> Visible and open for booking</label>
+    <div class="actions"><button class="btn-blue" [disabled]="busy() || uploading()">{{ editing() ? 'Save changes' : 'Add to slider' }}</button>@if (editing()) { <button type="button" class="btn-sm ghost" (click)="reset()">Cancel edit</button> }</div>
+  </form>
+
+  <h2 class="sub">All entertainment ({{ items().length }})</h2>
+  @if (!items().length) { <p class="empty">Nothing added yet.</p> }
+  <div class="list">
+    @for (e of items(); track e._id) {
+      <article class="item">
+        @if (e.imageUrl) { <img class="thumb" [src]="e.imageUrl" [alt]="e.title"> }
+        <div class="oh"><h3>{{ e.title }}</h3><span class="badge" [class.ok]="e.active" [class.bad]="!e.active">{{ e.active ? 'Live' : 'Hidden' }}</span></div>
+        <p class="small muted">{{ e.eventDate ? (e.eventDate | date:'d MMM y') : 'No date' }} {{ e.eventTime }} · {{ e.venue }}<br>{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') : 'Free' }} · {{ e.capacity > 0 ? e.capacity + ' seats' : 'unlimited' }}<br>Booked: {{ e.confirmedQty }} confirmed, {{ e.pendingQty }} pending</p>
+        <div class="actions"><button class="btn-sm ghost" (click)="edit(e)">Edit</button><button class="btn-sm" (click)="toggle(e)">{{ e.active ? 'Hide' : 'Show' }}</button><button class="btn-sm red" (click)="remove(e)">Remove</button></div>
+      </article>
+    }
+  </div>
+}
+
+@if (tab() === 'bookings') {
+  <div class="chips">@for (f of statuses; track f[0]) { <button class="chip" [class.on]="filter() === f[0]" (click)="setFilter(f[0])">{{ f[1] }}</button> }</div>
+  @if (!bookings().length) { <p class="empty">No bookings here.</p> }
+  <div class="list">
+    @for (b of bookings(); track b._id) {
+      <article class="item">
+        <div class="oh"><h3>{{ b.snapshot?.title }}</h3><span class="badge" [class.ok]="b.status === 'CONFIRMED'" [class.warn]="b.status === 'PAYMENT_REVIEW' || b.status === 'PENDING_PAYMENT'" [class.bad]="b.status === 'CANCELLED'">{{ label(b.status) }}</span></div>
+        <p class="small">🎟 {{ b.bookingNo }} · {{ b.qty }} ticket(s) · <b>{{ b.amount | currency:'INR':'symbol':'1.0-0' }}</b><br>👤 {{ b.member?.firstName }} {{ b.member?.lastName }} · 📞 {{ b.member?.phone }}<br>✉ {{ b.member?.email }}@if (b.payment) { <br>🔖 {{ b.payment.txn }} ({{ b.payment.status === 'APPROVED' ? 'Successful' : b.payment.status }}) }<br>🕒 {{ b.createdAt | date:'medium' }}</p>
+        @if (b.paymentNote) { <p class="note err">{{ b.paymentNote }}</p> }
+        <div class="actions">
+          @if (b.payment?.hasProof) { <button class="btn-sm ghost" (click)="proof(b)">🖼 Screenshot</button> }
+          @if (b.status === 'PAYMENT_REVIEW' && b.payment?.status === 'UNDER_REVIEW') { <button class="btn-sm green" (click)="review(b, 'approve')">Approve</button><button class="btn-sm red" (click)="review(b, 'reject')">Reject</button> }
+        </div>
+      </article>
+    }
+  </div>
+}

@@ -1,0 +1,14 @@
+<section class="page wrap box">
+  <h1 class="page-title">{{ title }}</h1>
+  @if (contact.info(); as c) {
+    <div class="item">
+      <p class="muted">We are happy to help. Reach us any time:</p>
+      @if (c.whatsappLink) { <a class="row-link wa" [href]="c.whatsappLink" target="_blank" rel="noopener"><span>💬</span><div><b>WhatsApp</b><small>{{ c.whatsapp }} · tap to chat</small></div></a> }
+      @if (c.email) { <a class="row-link" [href]="'mailto:' + c.email"><span>✉️</span><div><b>Email</b><small>{{ c.email }}</small></div></a> }
+      @if (c.phone) { <a class="row-link" [href]="'tel:' + c.phone"><span>📞</span><div><b>Call</b><small>{{ c.phone }}</small></div></a> }
+      @if (c.address) { <div class="row-link"><span>📍</span><div><b>Address</b><small>{{ c.address }}</small></div></div> }
+      @if (c.hours) { <div class="row-link"><span>🕒</span><div><b>Working hours</b><small>{{ c.hours }}</small></div></div> }
+      @if (!c.whatsappLink && !c.email && !c.phone && !c.address) { <p class="empty">Contact details will appear here soon.</p> }
+    </div>
+  } @else { <p class="empty">Loading…</p> }
+</section>

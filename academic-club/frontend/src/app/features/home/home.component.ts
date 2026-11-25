@@ -5,9 +5,10 @@ import { AuthService } from '../../core/auth/auth.service';
 import { homeFor } from '../../core/auth/auth.helpers';
 import { typeInfo } from '../../core/models/service-types';
 import { BannerSliderComponent } from '../../shared/components/banner-slider/banner-slider.component';
+import { EntertainmentSliderComponent } from '../../shared/components/entertainment-slider/entertainment-slider.component';
 import { StatCountersComponent } from '../../shared/components/stat-counters/stat-counters.component';
 
-@Component({ selector: 'ac-home', imports: [RouterLink, StatCountersComponent, BannerSliderComponent], templateUrl: './home.component.html', styleUrl: './home.component.scss' })
+@Component({ selector: 'ac-home', imports: [RouterLink, StatCountersComponent, BannerSliderComponent, EntertainmentSliderComponent], templateUrl: './home.component.html', styleUrl: './home.component.scss' })
 export class HomeComponent implements OnInit {
   private api = inject(ApiService);
   auth = inject(AuthService);

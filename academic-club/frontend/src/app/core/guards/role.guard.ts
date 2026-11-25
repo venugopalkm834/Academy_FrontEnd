@@ -3,9 +3,9 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { homeFor, loginFor } from '../auth/auth.helpers';
 import { Role } from '../models/user.model';
-export const roleGuard = (role: Role): CanActivateFn => () => {
+export const roleGuard = (role: Role): CanActivateFn => (_route, state) => {
   const u = inject(AuthService).user();
-  return u && u.role === role ? true : inject(Router).createUrlTree([loginFor(role)]);
+  return u && u.role === role ? true : inject(Router).createUrlTree([loginFor(role)], { queryParams: { returnUrl: state.url } });
 };
 
 // Login / register pages are only for visitors: a logged-in user goes straight to their dashboard.
