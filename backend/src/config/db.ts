@@ -10,7 +10,7 @@ export let dbInfo = { mode: DB_MODE, uri: env.mongo };
 
 async function embedded(persist: boolean) {
   const { MongoMemoryServer } = await import('mongodb-memory-server');
-  const dbPath = path.resolve(process.cwd(), '..', 'storage', 'db');
+  const dbPath = path.resolve(__dirname, '..', '..', '..', 'storage', 'db');
   if (persist) fs.mkdirSync(dbPath, { recursive: true });
   const srv = await MongoMemoryServer.create({ instance: persist ? { dbPath, port: 27018, storageEngine: 'wiredTiger' } : {} });
   console.log(persist ? `Embedded MongoDB, saved in ${dbPath}\nOpen it in MongoDB Compass with: mongodb://127.0.0.1:27018/academic_club` : 'In-memory MongoDB: data is LOST when the backend restarts');

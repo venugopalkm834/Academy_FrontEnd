@@ -3,3 +3,5 @@
 .mini { margin: 0; padding-left: 18px; font-size: 13px; color: #44546a; }
 .foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 6px; }
 .more { margin-left: auto; color: var(--blue); font-weight: 600; font-size: 13px; }
+
+@media (max-width: 480px) { .filters { grid-template-columns: 1fr 1fr; } .foot .btn-sm { flex: 1; } }

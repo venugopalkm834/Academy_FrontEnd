@@ -14,3 +14,11 @@ nav a.btn-blue, nav a.btn-yellow { color: #fff; } nav a.btn-yellow { color: var(
 nav button { font-family: inherit; }
 @media (max-width: 900px) { nav .btn-yellow, nav .btn-blue { margin: 4px 0; } }
 .ver { opacity: 0.5; font-size: 12px; }
+
+@media (max-width: 900px) { .header .row { gap: 8px; } .logo > span small { display: none; } .logo > span b { font-size: 17px; } }
+@media (max-width: 600px) {
+  .topbar .row { justify-content: center; } .topbar { font-size: 13px; padding: 8px 0; }
+  .footer .row { flex-direction: column; align-items: center; text-align: center; } .footer .social { justify-content: center; }
+  .legal { justify-content: center; gap: 10px 16px; text-align: center; }
+}
+@media (max-width: 380px) { .logo-img { height: 32px; } .logo > span b { font-size: 15px; } }

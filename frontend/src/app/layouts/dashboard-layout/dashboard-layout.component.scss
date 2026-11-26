@@ -1,4 +1,8 @@
-.dash { display: flex; min-height: 100vh; } .side { width: 250px; background: var(--navy); color: #fff; padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.dash { display: flex; min-height: 100vh; }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dtop { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: #fff; box-shadow: 0 2px 10px #0001; min-height: 56px; } .who { font-weight: 600; color: var(--navy); font-size: 14px; }
+.dbody { padding: 22px 20px 48px; width: 100%; flex: 1; min-width: 0; }
+@media (min-width: 901px) { .side { position: sticky; top: 0; height: 100vh; align-self: flex-start; } } .side { width: 250px; background: var(--navy); color: #fff; padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .side .role { color: var(--yellow); margin: 10px 8px 12px; letter-spacing: 1px; } .side a:not(.logo) { padding: 10px 14px; border-radius: 10px; font-size: 14px; } .side a.active, .side a:not(.logo):hover { background: #ffffff1f; border-left: 4px solid var(--yellow); }
 
 @media (max-width: 900px) {
@@ -12,7 +16,7 @@
 @media (max-width: 900px) {
   .side.open { box-shadow: 0 0 0 100vmax #0007; } .scrim { display: block; position: fixed; inset: 0; z-index: 25; }
   .side { width: min(290px, 84vw); } .who { display: none; } .dtop .btn-blue { display: none; }
-  .dbody { padding: 14px 12px 96px; }
+  .dbody { padding: 14px 12px 96px; } .dtop { padding: 6px 10px; gap: 6px; min-height: 52px; }
   .bottom { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 24; background: #fff; border-top: 1px solid #d6e2f3; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 14px #062b5518;
     a, button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 7px; font: 500 10.5px Poppins; color: #5b6b82; background: none; border: 0; cursor: pointer; min-height: 56px; justify-content: center; text-align: center; line-height: 1.15; span { font-size: 20px; } }
     a.active { color: var(--navy); font-weight: 700; box-shadow: inset 0 3px 0 var(--yellow); } }

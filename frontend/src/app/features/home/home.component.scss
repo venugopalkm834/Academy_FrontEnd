@@ -39,3 +39,10 @@
 a.sp { color: inherit; }
 .hero-in .btn-outline { margin: 8px 0 0 10px; }
 @media (max-width: 560px) { .hero-in .btn-outline { margin-left: 0; } .hero-in .btn-yellow, .hero-in .btn-outline { display: block; text-align: center; margin-bottom: 8px; } }
+
+@media (max-width: 700px) {
+  .hero { min-height: 0; } .hero-img { width: 100%; opacity: 0.22; mask-image: none; } .hero-in { padding-top: 24px; padding-bottom: 28px; } .hero p { font-size: 16px; margin: 12px 0 18px; }
+  .pill-title span { padding: 8px 24px; font-size: 18px; } .ft-title { padding: 6px 18px; font-size: 16px; white-space: normal; text-align: center; width: max-content; max-width: 90%; }
+  .featured { padding-top: 38px; } .ft-mid h3 { font-size: 20px; } .club { padding: 10px 18px; } .club strong { font-size: 30px; } .orig { padding: 8px 16px; } .orig s { font-size: 24px; } .price { justify-content: center; }
+  .b-cta { padding: 20px 18px; } .b-cta h3 { font-size: 22px; } .b { padding: 18px 6px; font-size: 14px; } .b:nth-child(2n) { border-right: 0; }
+}

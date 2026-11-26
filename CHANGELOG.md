@@ -20,3 +20,9 @@ Admin login: mobile `9000000000` / `Admin@12345` (from backend/.env).
 | 11 | New logo, no background | Header, footer, sidebar, ID card (screen and PDF), emails and the browser tab icon. Files: `frontend/public/logo.png`, `backend/assets/logo.png` |
 
 To change the logo later, replace those two files (keep a transparent PNG) and the two icon files `favicon.png` and `apple-touch-icon.png` in `frontend/public`.
+
+## Fixes after v0.12.0 (images and phone layout)
+- Uploads, the embedded database and the built website are now found relative to the project, not the folder the backend was started from (a different start folder used to hide every uploaded image).
+- Demo banner/event pictures are re-created on start if the storage folder was replaced.
+- Pictures that fail to load no longer show a broken-image icon.
+- Admin/partner/member forms get the two-column grid (one column on phones); the dashboard top bar and content area are styled; footer, header, home page, banner arrows, sponsor cover, bookings and filters tuned for phones.

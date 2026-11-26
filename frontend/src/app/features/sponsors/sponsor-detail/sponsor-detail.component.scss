@@ -8,3 +8,5 @@
 .price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; s { color: #8a97ab; } strong { font-size: 26px; color: var(--red); } }
 .save { background: #dff5e7; color: #14703c; border-radius: 8px; padding: 2px 10px; font-size: 13px; font-weight: 600; }
 .book { align-self: flex-start; margin-top: 4px; }
+
+@media (max-width: 480px) { .cover { flex-wrap: wrap; padding: 18px 14px; } .tagline { font-size: 15px; } .fees div { gap: 8px; } .price strong { font-size: 22px; } }

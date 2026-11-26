@@ -9,6 +9,10 @@ const REQUIRED_API = APP_VERSION;
 export class AppComponent implements OnInit {
   private api = inject(ApiService);
   problem = signal('');
+  constructor() {
+    // A picture that fails to load (file missing, bad address) must never show the browser's broken-image icon: keep its space, hide the icon.
+    if (typeof window !== 'undefined') window.addEventListener('error', (e) => { const t = e.target as HTMLElement; if (t?.tagName === 'IMG') t.classList.add('img-broken'); }, true);
+  }
   async ngOnInit() {
     try {
       const h = await this.api.get('/health');

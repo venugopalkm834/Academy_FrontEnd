@@ -28,7 +28,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 // Single-process mode: if the Angular app has been built (npm run build in frontend), this server also serves the website,
 // so http://localhost:5000 shows the site and the API together (no second server, no proxy, no CORS).
-const WEB_DIST = process.env.FRONTEND_DIST ? path.resolve(process.env.FRONTEND_DIST) : path.resolve(process.cwd(), '..', 'frontend', 'dist', 'academic-club', 'browser');
+const WEB_DIST = process.env.FRONTEND_DIST ? path.resolve(process.env.FRONTEND_DIST) : path.resolve(__dirname, '..', '..', 'frontend', 'dist', 'academic-club', 'browser');
 if (fs.existsSync(path.join(WEB_DIST, 'index.html'))) {
   app.use(express.static(WEB_DIST, { index: false, maxAge: '1h' }));
   app.get(/^\/(?!api\/|uploads\/).*/, (_q, s) => { s.setHeader('Cache-Control', 'no-cache'); s.sendFile(path.join(WEB_DIST, 'index.html')); });

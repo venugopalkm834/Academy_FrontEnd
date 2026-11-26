@@ -10,7 +10,7 @@ const art = (file: string, title: string, sub: string, c1: string, c2: string, w
 <rect width="${w}" height="${h}" fill="url(#g)"/><circle cx="${w * 0.86}" cy="${h * 0.2}" r="${h * 0.34}" fill="#FFC400" opacity="0.25"/><circle cx="${w * 0.1}" cy="${h * 0.95}" r="${h * 0.4}" fill="#ffffff" opacity="0.08"/>
 <text x="${w * 0.06}" y="${h * 0.48}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="${h * 0.15}" fill="#ffffff">${title}</text>
 <text x="${w * 0.06}" y="${h * 0.66}" font-family="Arial, Helvetica, sans-serif" font-size="${h * 0.075}" fill="#FFC400">${sub}</text></svg>`;
-  fs.writeFileSync(path.join(UPLOAD_DIR, file), svg); return `/uploads/${file}`;
+  const f = path.join(UPLOAD_DIR, file); if (!fs.existsSync(f)) fs.writeFileSync(f, svg); return `/uploads/${file}`;
 };
 const days = (n: number) => new Date(Date.now() + n * 864e5);
 
@@ -20,6 +20,11 @@ export async function seedContactDefaults() {
   await AdminSettings.updateOne({ key: 'global', $or: [{ 'site.contactEmail': { $exists: false } }, { 'site.contactEmail': '' }] }, { $set: { 'site.contactEmail': 'info@academicclub.com' } });
 }
 export async function seedDemoContent() {
+  // The database can outlive the storage folder (new project folder, wiped storage): re-create any demo picture the database still points to.
+  const demo: Parameters<typeof art>[] = [['demo-comedy.svg', 'Comedy Night', 'Live stand-up', '#9b3fd1', '#3b0f6b', 800, 450], ['demo-magic.svg', 'Kids Magic Show', 'Family fun', '#ff9a1f', '#c2410c', 800, 450], ['demo-music.svg', 'Music Concert', 'Live band', '#1e63d6', '#062b55', 800, 450],
+    ['demo-banner1.svg', 'Join The Academic Club', 'Exclusive discounts on courses, classes and activities', '#062B55', '#1e63d6', 1600, 500], ['demo-banner1m.svg', 'Join The Academic Club', 'Exclusive member discounts', '#062B55', '#1e63d6', 800, 600],
+    ['demo-banner2.svg', 'Find institutes near you', 'Schools, colleges, dance, yoga, coaching and more', '#2e9e44', '#17692a', 1600, 500], ['demo-banner2m.svg', 'Find institutes near you', 'Schools, dance, yoga, coaching', '#2e9e44', '#17692a', 800, 600]];
+  for (const d of demo) art(...d);
   if (!(await Entertainment.exists({}))) {
     await Entertainment.insertMany([
       { title: 'Stand-up Comedy Night', subtitle: 'Members get priority seats', venue: 'City Town Hall', eventDate: days(14), eventTime: '7:00 PM', price: 299, capacity: 120, description: 'An evening of live stand-up with the best comics in town.', imageUrl: art('demo-comedy.svg', 'Comedy Night', 'Live stand-up', '#9b3fd1', '#3b0f6b', 800, 450), order: 1 },
