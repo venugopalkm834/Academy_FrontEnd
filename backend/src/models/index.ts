@@ -22,6 +22,7 @@ export * from './notification.model';
 export * from './offer.model';
 export * from './partner.model';
 export * from './payment.model';
+export * from './service-type.model';
 export * from './session.model';
 export * from './sponsor.model';
 export * from './sponsor-request.model';

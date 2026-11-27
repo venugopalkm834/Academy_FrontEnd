@@ -1,1 +1,2 @@
-
+.ed { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed #c3cfe0; padding-top: 10px; label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; font-weight: 500; }
+  input, select { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid #c3cfe0; border-radius: 10px; font: 400 15px Poppins; } }

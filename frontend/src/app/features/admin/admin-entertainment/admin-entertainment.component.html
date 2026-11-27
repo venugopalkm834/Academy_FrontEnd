@@ -14,7 +14,9 @@
       <label>Event date<input type="date" formControlName="eventDate"></label>
       <label>Time<input formControlName="eventTime" placeholder="7:00 PM"></label>
       <label class="full">Venue<input formControlName="venue"></label>
-      <label>Price per ticket (₹, 0 = free)<input type="number" min="0" formControlName="price"></label>
+      <label>Original price (₹) <small class="muted">optional, shown struck through, e.g. 20000</small><input type="number" min="0" formControlName="originalPrice"></label>
+      <label>Offer price (₹, what members pay, 0 = free) <small class="muted">e.g. 16989</small><input type="number" min="0" formControlName="price"></label>
+      @if (form.value.originalPrice && form.value.price !== undefined && form.value.originalPrice > form.value.price) { <p class="note ok full">Members will see <s>₹{{ form.value.originalPrice }}</s> <b>₹{{ form.value.price }}</b> · {{ ((form.value.originalPrice - form.value.price) / form.value.originalPrice * 100) | number:'1.0-0' }}% OFF</p> }
       <label>Total seats (0 = unlimited)<input type="number" min="0" formControlName="capacity"></label>
       <label>Max tickets per booking<input type="number" min="1" formControlName="maxPerBooking"></label>
       <label>Display order (low = first)<input type="number" formControlName="order"></label>
@@ -32,7 +34,7 @@
       <article class="item">
         @if (e.imageUrl) { <img class="thumb" [src]="e.imageUrl" [alt]="e.title"> }
         <div class="oh"><h3>{{ e.title }}</h3><span class="badge" [class.ok]="e.active" [class.bad]="!e.active">{{ e.active ? 'Live' : 'Hidden' }}</span></div>
-        <p class="small muted">{{ e.eventDate ? (e.eventDate | date:'d MMM y') : 'No date' }} {{ e.eventTime }} · {{ e.venue }}<br>{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') : 'Free' }} · {{ e.capacity > 0 ? e.capacity + ' seats' : 'unlimited' }}<br>Booked: {{ e.confirmedQty }} confirmed, {{ e.pendingQty }} pending</p>
+        <p class="small muted">{{ e.eventDate ? (e.eventDate | date:'d MMM y') : 'No date' }} {{ e.eventTime }} · {{ e.venue }}<br>@if (e.originalPrice > e.price) { <s>{{ e.originalPrice | currency:'INR':'symbol':'1.0-0' }}</s> } {{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') : 'Free' }} · {{ e.capacity > 0 ? e.capacity + ' seats' : 'unlimited' }}<br>Booked: {{ e.confirmedQty }} confirmed, {{ e.pendingQty }} pending</p>
         <div class="actions"><button class="btn-sm ghost" (click)="edit(e)">Edit</button><button class="btn-sm" (click)="toggle(e)">{{ e.active ? 'Hide' : 'Show' }}</button><button class="btn-sm red" (click)="remove(e)">Remove</button></div>
       </article>
     }

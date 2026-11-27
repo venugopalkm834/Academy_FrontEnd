@@ -7,7 +7,8 @@
         @for (e of items(); track e.id) {
           <article class="card-e">
             <div class="pic" [style.background-image]="e.imageUrl ? 'url(' + e.imageUrl + ')' : null">@if (!e.imageUrl) { <span>🎭</span> }
-              <span class="price">{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}</span></div>
+              <span class="price">@if (e.originalPrice > e.price) { <s>{{ e.originalPrice | currency:'INR':'symbol':'1.0-0' }}</s> }{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}</span>
+              @if (e.originalPrice > e.price) { <span class="pct">{{ ((e.originalPrice - e.price) / e.originalPrice * 100) | number:'1.0-0' }}% OFF</span> }</div>
             <div class="body">
               <h3>{{ e.title }}</h3>
               @if (e.subtitle) { <p class="sub">{{ e.subtitle }}</p> }

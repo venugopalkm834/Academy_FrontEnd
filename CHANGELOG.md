@@ -26,3 +26,9 @@ To change the logo later, replace those two files (keep a transparent PNG) and t
 - Demo banner/event pictures are re-created on start if the storage folder was replaced.
 - Pictures that fail to load no longer show a broken-image icon.
 - Admin/partner/member forms get the two-column grid (one column on phones); the dashboard top bar and content area are styled; footer, header, home page, banner arrows, sponsor cover, bookings and filters tuned for phones.
+
+## v0.12.2 additions
+- **Institute Categories** (Admin menu): add / rename / reorder / hide / delete the categories used in Find Partner Institutes and academy registration (e.g. "Placements" is included; add your own).
+- **District** is now asked when an academy registers, and the admin can fix any academy's category / district / city / state / PIN with Partners > Edit details (old academies had no district, so the district list was empty).
+- **Club Entertainment offers**: Original price + Offer price. The website shows the old price struck through, the offer price and "% OFF".
+- **Delete partner**: Partners > Delete (removes the academy, its offerings and ads, and frees its mobile and email).

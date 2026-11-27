@@ -6,7 +6,7 @@ const common: Field[] = [
   { name: 'email', label: 'Email ID (for notifications and password reset)', type: 'email', hint: 'Enter a valid email address' }, { name: 'phone', label: 'Mobile number (used to log in)', type: 'tel', pattern: /^[6-9]\d{9}$/, hint: 'Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9' },
 ];
 const addr: Field[] = [
-  { name: 'address', label: 'Address', type: 'text', full: true }, { name: 'city', label: 'City', type: 'text' }, { name: 'state', label: 'State', type: 'text' },
+  { name: 'address', label: 'Address', type: 'text', full: true }, { name: 'city', label: 'City', type: 'text' }, { name: 'district', label: 'District', type: 'text' }, { name: 'state', label: 'State', type: 'text' },
   { name: 'pin', label: 'PIN Code', type: 'text', pattern: /^\d{6}$/, hint: '6 digits' },
 ];
 const pass: Field[] = [

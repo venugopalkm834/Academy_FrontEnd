@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { PaymentFormComponent } from '../../../shared/components/payment-form/payment-form.component';
@@ -7,7 +7,7 @@ import { errText } from '../../../core/utils/error.util';
 
 const LABEL: Record<string, string> = { PENDING_PAYMENT: 'Payment needed', PAYMENT_REVIEW: 'Verifying payment', CONFIRMED: 'Confirmed', CANCELLED: 'Cancelled' };
 
-@Component({ selector: 'ac-member-entertainment', imports: [PaymentFormComponent, CurrencyPipe, DatePipe], templateUrl: './member-entertainment.component.html', styleUrl: './member-entertainment.component.scss' })
+@Component({ selector: 'ac-member-entertainment', imports: [PaymentFormComponent, CurrencyPipe, DatePipe, DecimalPipe], templateUrl: './member-entertainment.component.html', styleUrl: './member-entertainment.component.scss' })
 export class MemberEntertainmentComponent implements OnInit {
   private api = inject(ApiService);
   private route = inject(ActivatedRoute);

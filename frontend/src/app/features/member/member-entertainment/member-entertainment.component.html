@@ -9,7 +9,7 @@
       @if (e.subtitle) { <p class="headline">{{ e.subtitle }}</p> }
       <p class="small muted">@if (e.eventDate) { 📅 {{ e.eventDate | date:'EEE, d MMM y' }} {{ e.eventTime }} } @if (e.venue) { <br>📍 {{ e.venue }} }</p>
       @if (e.description) { <p class="small">{{ e.description }}</p> }
-      <div class="oh"><b class="pr">{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}</b>
+      <div class="oh"><b class="pr">@if (e.originalPrice > e.price) { <s class="was">{{ e.originalPrice | currency:'INR':'symbol':'1.0-0' }}</s> }{{ e.price > 0 ? (e.price | currency:'INR':'symbol':'1.0-0') + ' / ticket' : 'Free' }}@if (e.originalPrice > e.price) { <span class="badge ok">{{ ((e.originalPrice - e.price) / e.originalPrice * 100) | number:'1.0-0' }}% OFF</span> }</b>
         @if (e.seatsLeft !== null) { <span class="badge" [class.ok]="e.seatsLeft > 5" [class.bad]="e.seatsLeft <= 5">{{ e.seatsLeft > 0 ? e.seatsLeft + ' seats left' : 'Sold out' }}</span> }</div>
       @if (e.seatsLeft !== 0) {
         <div class="buy">

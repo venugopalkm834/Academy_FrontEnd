@@ -1,10 +1,10 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 
 // "Club Entertainment" on the home page: every item the admin lists slides here. Hidden when there is nothing to show.
-@Component({ selector: 'ac-entertainment-slider', imports: [RouterLink, CurrencyPipe, DatePipe], templateUrl: './entertainment-slider.component.html', styleUrl: './entertainment-slider.component.scss' })
+@Component({ selector: 'ac-entertainment-slider', imports: [RouterLink, CurrencyPipe, DatePipe, DecimalPipe], templateUrl: './entertainment-slider.component.html', styleUrl: './entertainment-slider.component.scss' })
 export class EntertainmentSliderComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
   @ViewChild('track') track?: ElementRef<HTMLElement>;

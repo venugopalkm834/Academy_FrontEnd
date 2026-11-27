@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { APP_VERSION } from './core/config/version';
 import { ApiService } from './core/services/api.service';
+import { loadServiceTypes } from './core/models/service-types';
 
 const REQUIRED_API = APP_VERSION;
 
@@ -14,6 +15,7 @@ export class AppComponent implements OnInit {
     if (typeof window !== 'undefined') window.addEventListener('error', (e) => { const t = e.target as HTMLElement; if (t?.tagName === 'IMG') t.classList.add('img-broken'); }, true);
   }
   async ngOnInit() {
+    loadServiceTypes(this.api); // categories are managed by the admin
     try {
       const h = await this.api.get('/health');
       if (h.version !== REQUIRED_API) this.problem.set(`The backend is out of date (v${h.version || 'old'}, expected v${REQUIRED_API})${h.folder ? ' and is running from ' + h.folder : ''}. Stop it, replace that backend folder with the one from the latest zip, run "npm install" and "npm run dev".`);

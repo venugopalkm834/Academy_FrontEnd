@@ -58,6 +58,7 @@ export const routes: Routes = [
   ]),
   dash('ADMIN', [
     page('dashboard', () => import('./features/admin/admin-home/admin-home.component').then((m) => m.AdminHomeComponent)),
+    page('service-types', () => import('./features/admin/admin-service-types/admin-service-types.component').then((m) => m.AdminServiceTypesComponent)),
     page('partners', () => import('./features/admin/admin-partners/admin-partners.component').then((m) => m.AdminPartnersComponent)),
     page('offerings', () => import('./features/admin/admin-offerings/admin-offerings.component').then((m) => m.AdminOfferingsComponent)),
     page('sponsor-requests', () => import('./features/admin/admin-sponsor-requests/admin-sponsor-requests.component').then((m) => m.AdminSponsorRequestsComponent)),

@@ -7,9 +7,12 @@ import { authenticate, requireRole, validate, wrap, HttpError } from '../../midd
 // Admin manages the Club Entertainment list (any number of items) and sees the bookings. Payments are approved in Admin > Payments (or from the bookings tab).
 const r = Router(); r.use(authenticate, requireRole('ADMIN'));
 const oid = (id: string) => { if (!isValidObjectId(id)) throw new HttpError(400, 'Invalid id'); return id; };
-const schema = z.object({ title: z.string().trim().min(2).max(120), subtitle: z.string().max(160).optional(), description: z.string().max(2000).optional(), imageUrl: z.string().max(300).optional(), venue: z.string().max(160).optional(),
-  eventDate: z.coerce.date().optional(), eventTime: z.string().max(40).optional(), price: z.coerce.number().min(0).default(0), capacity: z.coerce.number().int().min(0).default(0), maxPerBooking: z.coerce.number().int().min(1).max(50).default(10),
+const schema0 = z.object({ title: z.string().trim().min(2).max(120), subtitle: z.string().max(160).optional(), description: z.string().max(2000).optional(), imageUrl: z.string().max(300).optional(), venue: z.string().max(160).optional(),
+  eventDate: z.coerce.date().optional(), eventTime: z.string().max(40).optional(), price: z.coerce.number().min(0).default(0), originalPrice: z.coerce.number().min(0).default(0), capacity: z.coerce.number().int().min(0).default(0), maxPerBooking: z.coerce.number().int().min(1).max(50).default(10),
   startsAt: z.coerce.date().optional(), expiresAt: z.coerce.date().optional(), order: z.coerce.number().default(0), active: z.boolean().default(true) });
+
+const offerOk = (d: any) => !d.originalPrice || d.price === undefined || d.originalPrice > d.price;
+const schema = schema0.refine(offerOk, { message: 'The original price must be higher than the offer price', path: ['originalPrice'] });
 
 r.get('/entertainment', wrap(async (_req, res) => {
   const items: any[] = await Entertainment.find({ deletedAt: null }).sort('order -createdAt').lean();
@@ -18,7 +21,7 @@ r.get('/entertainment', wrap(async (_req, res) => {
     return { ...i, confirmedQty: n('CONFIRMED'), pendingQty: n('PENDING_PAYMENT') + n('PAYMENT_REVIEW') }; }) });
 }));
 r.post('/entertainment', validate(schema), wrap(async (req, res) => { res.status(201).json(await Entertainment.create(req.body)); }));
-r.put('/entertainment/:id', validate(schema.partial()), wrap(async (req, res) => { const e = await Entertainment.findOneAndUpdate({ _id: oid(req.params.id), deletedAt: null }, req.body, { new: true }); if (!e) throw new HttpError(404, 'Not found'); res.json(e); }));
+r.put('/entertainment/:id', validate(schema0.partial().refine(offerOk, { message: 'The original price must be higher than the offer price', path: ['originalPrice'] })), wrap(async (req, res) => { const e = await Entertainment.findOneAndUpdate({ _id: oid(req.params.id), deletedAt: null }, req.body, { new: true }); if (!e) throw new HttpError(404, 'Not found'); res.json(e); }));
 r.delete('/entertainment/:id', wrap(async (req, res) => { await Entertainment.updateOne({ _id: oid(req.params.id) }, { deletedAt: new Date(), active: false }); res.json({ message: 'Removed' }); }));
 
 r.get('/entertainment-bookings', wrap(async (req, res) => {

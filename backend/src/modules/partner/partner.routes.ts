@@ -14,7 +14,7 @@ const ctx = async (req: Request) => {
   if (!user) throw new HttpError(404, 'Account not found. Please log in again.');
   const partner: any = (await Partner.findOne({ user: user._id })) || (await Partner.create({ user: user._id, institutionName: user.firstName, institutionType: 'OTHER', contactName: user.firstName }));
   const institution: any = (await Institution.findOne({ partner: partner._id })) ||
-    (await Institution.create({ partner: partner._id, name: partner.institutionName, type: partner.institutionType, address: user.address, city: user.city, state: user.state, pin: user.pin, contactPerson: partner.contactName, contactPhone: user.phone, email: user.email, website: partner.website }));
+    (await Institution.create({ partner: partner._id, name: partner.institutionName, type: partner.institutionType, address: user.address, city: user.city, district: user.district, state: user.state, pin: user.pin, contactPerson: partner.contactName, contactPhone: user.phone, email: user.email, website: partner.website }));
   return { partner, institution };
 };
 const own = async (req: Request) => {

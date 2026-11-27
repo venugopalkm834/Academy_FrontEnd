@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isValidObjectId } from 'mongoose';
-import { Entertainment, EntertainmentBooking, Banner, Sponsor, Course, Partner, Institution, User, Membership } from '../../models';
+import { Entertainment, EntertainmentBooking, Banner, Sponsor, Course, Partner, Institution, User, Membership, ServiceType } from '../../models';
 import { membershipView, publicCount } from '../../services/membership';
 import { readPrivateImage } from '../../services/files';
 import { HttpError, wrap } from '../../middleware';
@@ -82,6 +82,7 @@ r.get('/stats', wrap(async (_req, res) => {
 r.get('/config', wrap(async (_req, res) => { const s = await getSettings(); res.json({ requireAadhaar: s.requireAadhaar !== false }); }));
 
 // State / district / city options for the location search, taken from the institutes members can actually see
+r.get('/service-types', wrap(async (_req, res) => { res.json({ items: (await ServiceType.find({ active: true }).sort('order label').lean()).map((t: any) => ({ value: t.key, label: t.label, icon: t.icon || '✨' })) }); }));
 r.get('/locations', wrap(async (req, res) => {
   const { state = '', district = '' } = req.query as Record<string, string>;
   const all = await visibleInstitutions(); const uniq = (a: any[]) => [...new Set(a.filter(Boolean))].sort((x, y) => String(x).localeCompare(String(y)));
@@ -119,6 +120,6 @@ r.get('/entertainment', wrap(async (_req, res) => {
   const used: any[] = await EntertainmentBooking.aggregate([{ $match: { entertainment: { $in: items.map((i) => i._id) }, status: { $in: ['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'CONFIRMED'] } } }, { $group: { _id: '$entertainment', n: { $sum: '$qty' } } }]);
   const map = new Map(used.map((u) => [String(u._id), u.n]));
   res.json({ items: items.map((i) => ({ id: i._id, title: i.title, subtitle: i.subtitle, description: i.description, imageUrl: i.imageUrl, venue: i.venue, eventDate: i.eventDate, eventTime: i.eventTime,
-    price: i.price, maxPerBooking: i.maxPerBooking, seatsLeft: i.capacity > 0 ? Math.max(0, i.capacity - (map.get(String(i._id)) || 0)) : null })) });
+    price: i.price, originalPrice: i.originalPrice > i.price ? i.originalPrice : 0, maxPerBooking: i.maxPerBooking, seatsLeft: i.capacity > 0 ? Math.max(0, i.capacity - (map.get(String(i._id)) || 0)) : null })) });
 }));
 export default r;

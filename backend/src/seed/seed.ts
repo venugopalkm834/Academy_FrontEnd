@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'; import mongoose from 'mongoose';
 import { connectDB } from '../config/db'; import '../config/env';
-import { User, CourseCategory, AdminSettings, MembershipPlan } from '../models';
+import { User, CourseCategory, AdminSettings, MembershipPlan, ServiceType, DEFAULT_SERVICE_TYPES } from '../models';
 import { seedDemo } from './demo';
 import { seedContactDefaults, seedDemoContent } from './demo-content';
 import { normMobile } from '../services/mobile';
@@ -20,6 +20,7 @@ export async function runSeed() {
   if (!(await MembershipPlan.exists({}))) await MembershipPlan.insertMany([ // starter plans: the admin edits prices / adds plans in Membership Plans
     { name: 'One-Year Membership', kind: 'YEARLY', price: 499, validityDays: 365, educationGroup: 'ANY', description: 'Full member benefits for one year', benefits: ['Digital ID card', 'Member-only offers', 'Partner discounts'], order: 1 },
     { name: 'Lifetime Membership', kind: 'LIFETIME', price: 1999, educationGroup: 'ANY', description: 'Pay once, member for life', benefits: ['Digital ID card', 'Member-only offers', 'Partner discounts', 'No renewals'], order: 2 }]);
+  for (const [i, [key, label, icon]] of DEFAULT_SERVICE_TYPES.entries()) await ServiceType.updateOne({ key }, { $setOnInsert: { key, label, icon, order: i, active: true } }, { upsert: true });
   await seedContactDefaults(); // WhatsApp number + contact email (admin can change them)
   if (process.env.SEED_DEMO !== 'false') { await seedDemo(); await seedDemoContent(); }
   console.log(`Seeded. Admin login: mobile ${phone} / password from .env (ADMIN_PASSWORD)`);

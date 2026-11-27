@@ -1,7 +1,7 @@
 import { Router, Response, Request } from 'express';
 import bcrypt from 'bcryptjs'; import jwt from 'jsonwebtoken'; import crypto from 'crypto'; import { z } from 'zod';
 import { env } from '../../config/env';
-import { User, Partner, Institution, Membership, Session, Role, INST_TYPES } from '../../models';
+import { User, Partner, Institution, Membership, Session, Role, ServiceType } from '../../models';
 import { wrap, validate, authenticate, HttpError } from '../../middleware';
 import { sendMail } from '../../services/mail';
 import { getSettings } from '../../services/settings';
@@ -28,8 +28,8 @@ const memberSchema = z.object({
   aadhaar: z.string().optional(), aadhaarConsent: z.boolean().optional(), photoKey: z.string().regex(/^[0-9a-f-]{36}\.(jpe?g|png)$/, 'Please add your photo'),
   password: pw, confirmPassword: z.string(), acceptTerms: z.literal(true), acceptPrivacy: z.literal(true),
 }).refine(match, { message: 'Passwords do not match', path: ['confirmPassword'] });
-const partnerSchema = z.object({ ...base, institutionName: z.string().min(2), institutionType: z.enum(INST_TYPES as [string, ...string[]]),
-  contactName: z.string().min(2), altPhone: mobileField.optional(), address: z.string().min(3), city: z.string(), state: z.string(), pin: z.string().regex(/^\d{6}$/), website: z.string().url().optional() }).refine(match, { message: 'Passwords do not match', path: ['confirmPassword'] });
+const partnerSchema = z.object({ ...base, institutionName: z.string().min(2), institutionType: z.string().trim().toUpperCase().min(2).max(40),
+  contactName: z.string().min(2), altPhone: mobileField.optional(), address: z.string().min(3), city: z.string().trim().min(2), district: z.string().trim().min(2).max(60), state: z.string().trim().min(2), pin: z.string().regex(/^\d{6}$/), website: z.string().url().optional() }).refine(match, { message: 'Passwords do not match', path: ['confirmPassword'] });
 
 async function issue(res: Response, req: Request, userId: string, role: Role) {
   const access = jwt.sign({ sub: userId, role }, env.access, { expiresIn: '15m' });
@@ -64,9 +64,10 @@ r.post('/member/register', validate(memberSchema), wrap(async (req, res) => {
 
 r.post('/partner/register', validate(partnerSchema), wrap(async (req, res) => {
   const { password, confirmPassword, institutionName, institutionType, website, ...d } = req.body; const t = rnd();
+  if (!(await ServiceType.exists({ key: institutionType, active: true }))) throw new HttpError(400, 'Please choose a valid institution type');
   const u = await User.create({ ...d, firstName: d.contactName, role: 'PARTNER', status: 'PENDING', passwordHash: await bcrypt.hash(password, 12), verifyTokenHash: sha(t) });
   const p = await Partner.create({ user: u._id, institutionName, institutionType, contactName: d.contactName, website, trialEndsAt: new Date(Date.now() + ((await getSettings()).partnerFreeDays || 0) * 864e5) });
-  await Institution.create({ partner: p._id, name: institutionName, type: institutionType, address: d.address, city: d.city, state: d.state, pin: d.pin, contactPerson: d.contactName, contactPhone: d.phone, email: d.email, website });
+  await Institution.create({ partner: p._id, name: institutionName, type: institutionType, address: d.address, city: d.city, district: d.district, state: d.state, pin: d.pin, contactPerson: d.contactName, contactPhone: d.phone, email: d.email, website });
   await sendVerify(u, t);
   await onRegistered('PARTNER', u, institutionName);
   res.status(201).json({ message: 'Registration received. Your account is pending admin approval.' });

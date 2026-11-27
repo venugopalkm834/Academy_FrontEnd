@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { DB_MODE } from './config/db';
 import { env } from './config/env';
-import publicRoutes from './modules/public/public.routes'; import partnerRoutes from './modules/partner/partner.routes'; import paymentsRoutes from './modules/payments/payments.routes'; import membershipRoutes from './modules/member/membership.routes'; import webhookRoutes from './modules/webhooks/webhooks.routes'; import adminMembershipRoutes from './modules/admin/admin.membership.routes'; import notificationRoutes from './modules/notifications/notifications.routes'; import adminEmailRoutes from './modules/admin/admin.email.routes'; import memberEntertainmentRoutes from './modules/member/member.entertainment.routes'; import adminEntertainmentRoutes from './modules/admin/admin.entertainment.routes'; import memberRoutes from './modules/member/member.routes'; import adminRoutes from './modules/admin/admin.routes'; import uploadRoutes, { UPLOAD_DIR } from './modules/upload/upload.routes'; import authRoutes from './modules/auth/auth.routes'; import { errorHandler, auditMutations } from './middleware';
+import publicRoutes from './modules/public/public.routes'; import partnerRoutes from './modules/partner/partner.routes'; import paymentsRoutes from './modules/payments/payments.routes'; import membershipRoutes from './modules/member/membership.routes'; import webhookRoutes from './modules/webhooks/webhooks.routes'; import adminMembershipRoutes from './modules/admin/admin.membership.routes'; import notificationRoutes from './modules/notifications/notifications.routes'; import adminEmailRoutes from './modules/admin/admin.email.routes'; import adminCatalogRoutes from './modules/admin/admin.catalog.routes'; import memberEntertainmentRoutes from './modules/member/member.entertainment.routes'; import adminEntertainmentRoutes from './modules/admin/admin.entertainment.routes'; import memberRoutes from './modules/member/member.routes'; import adminRoutes from './modules/admin/admin.routes'; import uploadRoutes, { UPLOAD_DIR } from './modules/upload/upload.routes'; import authRoutes from './modules/auth/auth.routes'; import { errorHandler, auditMutations } from './middleware';
 export const VERSION = '0.12.0'; // bump when the API changes; the frontend warns if it talks to an older backend
 const app = express();
 app.set('trust proxy', 1);
@@ -23,6 +23,7 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/admin', adminMembershipRoutes); // before adminRoutes: its dashboard / members / payments list replace the older ones
 app.use('/api/admin', adminEmailRoutes);
+app.use('/api/admin', adminCatalogRoutes);
 app.use('/api/admin', adminEntertainmentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);

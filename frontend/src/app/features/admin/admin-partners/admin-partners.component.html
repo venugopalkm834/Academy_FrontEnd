@@ -1,13 +1,13 @@
 <h1 class="page-title">Partners</h1>
 <div class="chips">@for (f of filters; track f) { <button class="chip" [class.on]="filter() === f" (click)="setFilter(f)">{{ f || 'All' }}</button> }</div>
-@if (error()) { <div class="note err">{{ error() }}</div> }
+@if (error()) { <div class="note err">{{ error() }}</div> } @if (msg()) { <div class="note ok">{{ msg() }}</div> }
 @if (!loading() && !items().length) { <p class="empty">No partners in this view.</p> }
 <div class="list">
   @for (p of items(); track p.id) {
     <article class="item">
       <div class="oh"><h3>{{ p.institution?.name }}</h3>
         <span class="badge" [class.ok]="p.state === 'APPROVED'" [class.warn]="p.state === 'PENDING'" [class.bad]="p.state === 'REJECTED' || p.state === 'SUSPENDED'">{{ p.state }}</span></div>
-      <p><span class="badge">{{ label(p.institution?.type) }}</span> <span class="muted small">📍 {{ p.institution?.city }}</span></p>
+      <p><span class="badge">{{ label(p.institution?.type) }}</span> <span class="muted small">📍 {{ p.institution?.city }}{{ p.institution?.district ? ', ' + p.institution?.district : '' }}{{ p.institution?.state ? ', ' + p.institution?.state : '' }}</span></p>
       <p class="small">👤 {{ p.contactName }}<br>✉ {{ p.email }}<br>📞 {{ p.phone }}</p>
       @if (p.rejectionReason) { <p class="note err">{{ p.rejectionReason }}</p> }
       <div class="actions">
@@ -16,7 +16,22 @@
         @if (p.state === 'PENDING') { <button class="btn-sm red" (click)="act(p, 'reject')">Reject</button> }
         @if (p.state === 'APPROVED') { <button class="btn-sm red" (click)="act(p, 'suspend')">Suspend</button> }
         @if (p.state === 'SUSPENDED') { <button class="btn-sm green" (click)="act(p, 'reactivate')">Reactivate</button> }
+        <button class="btn-sm ghost" (click)="editId() === p.id ? editId.set('') : startEdit(p)">{{ editId() === p.id ? 'Close' : '✏ Edit details' }}</button>
+        <button class="btn-sm red" (click)="remove(p)">🗑 Delete</button>
       </div>
+      @if (editId() === p.id) {
+        <div class="ed">
+          <label>Institution name<input [value]="draft.name" (input)="draft.name = $any($event.target).value"></label>
+          <label>Category<select [value]="draft.type" (change)="draft.type = $any($event.target).value">@for (t of types; track t.value) { <option [value]="t.value" [selected]="t.value === draft.type">{{ t.icon }} {{ t.label }}</option> }</select></label>
+          <label>Address<input [value]="draft.address" (input)="draft.address = $any($event.target).value"></label>
+          <label>City<input [value]="draft.city" (input)="draft.city = $any($event.target).value"></label>
+          <label>District<input [value]="draft.district" (input)="draft.district = $any($event.target).value"></label>
+          <label>State<input [value]="draft.state" (input)="draft.state = $any($event.target).value"></label>
+          <label>PIN<input inputmode="numeric" maxlength="6" [value]="draft.pin" (input)="draft.pin = $any($event.target).value"></label>
+          <label>Phone<input [value]="draft.contactPhone" (input)="draft.contactPhone = $any($event.target).value"></label>
+          <div class="actions"><button class="btn-sm green" (click)="saveEdit(p)">Save details</button></div>
+        </div>
+      }
     </article>
   }
 </div>
